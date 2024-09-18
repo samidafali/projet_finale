@@ -5,7 +5,7 @@ const cors = require("cors");
 const connection = require("./Db");
 const userRoutes = require("./routes/users");
 const authRoutes = require("./routes/auth");
-
+const adminRoutes = require("./routes/admin");
 // database connection
 connection();
 
@@ -24,6 +24,6 @@ const corsOptions = {
 // routes
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
-
+app.use("/api/admin", adminRoutes);
 const port = process.env.PORT || 8050;
 app.listen(port, console.log(`Listening on port ${port}...`));
