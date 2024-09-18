@@ -1,8 +1,5 @@
 import { Route, Routes, Navigate } from "react-router-dom";
-//import Main from "./components/Main";
-//import Signup from "./components/Singup";
-//import Login from "./components/Login";
-//import EmailVerify from "./components/EmailVerify";
+
 import Main from "./components/Main/Main.jsx";
 import Signup from "./components/Signup/Signup.jsx";
 import Login from "./components/Login/Login.jsx";

@@ -1,19 +1,43 @@
 .login_container {
 	width: 100%;
 	min-height: 100vh;
-	background-color: #f5f5f5;
+	background: linear-gradient(135deg, #f0f0f0 30%, #d9d9d9); /* Fond avec léger gradient */
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	overflow: hidden;
 }
 
 .login_form_container {
 	width: 900px;
 	height: 500px;
 	display: flex;
-	border-radius: 10px;
-	box-shadow: 0px 3px 3px -2px rgb(0 0 0 / 20%),
-		0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%);
+	border-radius: 15px; /* Bords plus arrondis pour un design moderne */
+	box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2); /* Ombre plus large et plus douce */
+	background-color: white;
+	opacity: 0;
+	transform: translateX(-50px); /* Translation initiale */
+	animation: slide-in 1s ease-out forwards, fade-in 1s ease-in forwards; /* Animation */
+}
+
+/* Animation de translation */
+@keyframes slide-in {
+	from {
+		transform: translateX(-50px); /* Commence à gauche */
+	}
+	to {
+		transform: translateX(0); /* Retour à la place normale */
+	}
+}
+
+/* Animation de fondu (opacity) */
+@keyframes fade-in {
+	from {
+		opacity: 0; /* Commence invisible */
+	}
+	to {
+		opacity: 1; /* Devient visible */
+	}
 }
 
 .left {
@@ -23,30 +47,43 @@
 	align-items: center;
 	justify-content: center;
 	background-color: white;
-	border-top-left-radius: 10px;
-	border-bottom-left-radius: 10px;
+	border-top-left-radius: 15px;
+	border-bottom-left-radius: 15px;
 }
 
 .form_container {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	opacity: 0;
+	animation: fade-in 1.5s ease-in forwards; /* Animation de fondu */
 }
 
 .form_container h1 {
-	font-size: 40px;
-	margin-top: 0;
+	font-size: 36px;
+	color: #333;
+	margin-bottom: 20px;
+	letter-spacing: 1px;
 }
 
+/* Champs de texte améliorés */
 .input {
 	outline: none;
-	border: none;
+	border: 2px solid #ccc;
 	width: 370px;
 	padding: 15px;
 	border-radius: 10px;
-	background-color: #edf5f3;
-	margin: 5px 0;
-	font-size: 14px;
+	background-color: #f9f9f9;
+	margin: 10px 0;
+	font-size: 16px;
+	transition: all 0.3s ease;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Ombre légère */
+}
+
+.input:focus {
+	border-color: #333;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Ombre subtile lors du focus */
+	transform: scale(1.02); /* Légère expansion au focus */
 }
 
 .error_msg {
@@ -66,16 +103,19 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	background-color: #3bb19b;
-	border-top-right-radius: 10px;
-	border-bottom-right-radius: 10px;
+	background-color: #000; /* Couleur noire au lieu du vert */
+	border-top-right-radius: 15px;
+	border-bottom-right-radius: 15px;
+	position: relative;
 }
 
 .right h1 {
 	margin-top: 0;
 	color: white;
 	font-size: 40px;
+	letter-spacing: 1.5px;
 	align-self: center;
+	text-shadow: 0 4px 10px rgba(255, 255, 255, 0.3); /* Ombre légère sur le texte */
 }
 
 .white_btn,
@@ -83,16 +123,35 @@
 	border: none;
 	outline: none;
 	padding: 12px 0;
-	background-color: white;
-	border-radius: 20px;
 	width: 180px;
 	font-weight: bold;
 	font-size: 14px;
 	cursor: pointer;
+	border-radius: 30px; /* Bords plus arrondis pour un style moderne */
+	transition: all 0.3s ease;
+}
+
+.white_btn {
+	background-color: white;
+	color: black;
+	border: 2px solid black;
+}
+
+.white_btn:hover {
+	background-color: black;
+	color: white;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Effet d'ombre lors du hover */
+	transform: translateY(-5px); /* Effet de levée lors du hover */
 }
 
 .green_btn {
-	background-color: #3bb19b;
+	background-color: black; /* Changement en noir */
 	color: white;
 	margin: 10px;
+}
+
+.green_btn:hover {
+	background-color: #444; /* Couleur noire légèrement éclaircie au hover */
+	transform: translateY(-5px);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Effet d'ombre lors du hover */
 }

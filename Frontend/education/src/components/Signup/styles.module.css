@@ -1,19 +1,43 @@
 .signup_container {
 	width: 100%;
 	min-height: 100vh;
-	background-color: #f5f5f5;
+	background: linear-gradient(135deg, #f0f0f0 30%, #d9d9d9); /* Fond avec un léger gradient */
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	overflow: hidden;
 }
 
 .signup_form_container {
 	width: 900px;
 	height: 500px;
 	display: flex;
-	border-radius: 10px;
-	box-shadow: 0px 3px 3px -2px rgb(0 0 0 / 20%),
-		0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%);
+	border-radius: 15px; /* Bords plus arrondis pour un design moderne */
+	box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.25); /* Ombre plus large et plus douce */
+	background-color: white;
+	opacity: 0;
+	transform: translateX(-50px);
+	animation: slide-in 1s ease-out forwards, fade-in 1s ease-in forwards;
+}
+
+/* Animation de translation */
+@keyframes slide-in {
+	from {
+		transform: translateX(-50px);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+/* Animation de fondu (opacity) */
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
 }
 
 .left {
@@ -22,16 +46,29 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	background-color: #3bb19b;
-	border-top-left-radius: 10px;
-	border-bottom-left-radius: 10px;
+	background-color: #1c1c1c; /* Couleur noir foncé pour un meilleur contraste */
+	border-top-left-radius: 15px;
+	border-bottom-left-radius: 15px;
+	animation: left-slide 1.2s ease-out forwards;
+}
+
+@keyframes left-slide {
+	from {
+		transform: translateX(-100px);
+	}
+	to {
+		transform: translateX(0);
+	}
 }
 
 .left h1 {
 	margin-top: 0;
 	color: white;
-	font-size: 35px;
-	align-self: center;
+	font-size: 36px;
+	font-weight: bold;
+	text-align: center;
+	letter-spacing: 1.5px; /* Meilleure espacement pour un design plus élégant */
+	text-shadow: 0 4px 10px rgba(255, 255, 255, 0.3); /* Ajout d'une légère ombre de texte */
 }
 
 .right {
@@ -41,63 +78,101 @@
 	align-items: center;
 	justify-content: center;
 	background-color: white;
-	border-top-right-radius: 10px;
-	border-bottom-right-radius: 10px;
+	border-top-right-radius: 15px;
+	border-bottom-right-radius: 15px;
 }
 
 .form_container {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	opacity: 0;
+	animation: fade-in 1.5s ease-in forwards;
+	animation-delay: 0.5s;
 }
 
 .form_container h1 {
-	font-size: 40px;
-	margin-top: 0;
+	font-size: 36px;
+	color: #333;
+	margin-bottom: 20px;
+	letter-spacing: 1px; /* Ajout d'espacement pour le titre */
 }
 
+/* Amélioration des champs de texte */
 .input {
 	outline: none;
-	border: none;
+	border: 2px solid #ccc;
 	width: 370px;
 	padding: 15px;
 	border-radius: 10px;
-	background-color: #edf5f3;
-	margin: 5px 0;
-	font-size: 14px;
+	background-color: #f9f9f9;
+	margin: 10px 0;
+	font-size: 16px;
+	transition: all 0.3s ease;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.input:focus {
+	border-color: #333;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Ombre subtile lors du focus */
+	transform: scale(1.02); /* Légère expansion lors du focus */
 }
 
 .error_msg,
 .success_msg {
 	width: 370px;
 	padding: 15px;
-	margin: 5px 0;
+	margin: 10px 0;
 	font-size: 14px;
-	background-color: #f34646;
-	color: white;
-	border-radius: 5px;
+	border-radius: 8px;
 	text-align: center;
 }
 
-.success_msg {
-	background-color: #5cdd5c;
+.error_msg {
+	background-color: #ff4d4d;
+	color: white;
 }
 
+.success_msg {
+	background-color: #4caf50;
+	color: white;
+}
+
+/* Boutons stylisés */
 .white_btn,
 .green_btn {
 	border: none;
 	outline: none;
 	padding: 12px 0;
-	background-color: white;
-	border-radius: 20px;
 	width: 180px;
 	font-weight: bold;
 	font-size: 14px;
 	cursor: pointer;
+	border-radius: 30px; /* Bords plus arrondis pour un style moderne */
+	transition: all 0.3s ease;
+	position: relative;
+}
+
+.white_btn {
+	background-color: white;
+	color: black;
+	border: 2px solid black;
+}
+
+.white_btn:hover {
+	background-color: black;
+	color: white;
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); /* Ombre douce lors du survol */
+	transform: translateY(-5px); /* Effet de levée lors du hover */
 }
 
 .green_btn {
-	background-color: #3bb19b;
+	background-color: black;
 	color: white;
-	margin: 10px;
+}
+
+.green_btn:hover {
+	background-color: #444;
+	transform: translateY(-5px);
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); /* Ombre douce lors du survol */
 }
