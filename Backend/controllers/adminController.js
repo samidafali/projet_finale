@@ -4,19 +4,21 @@ const jwt = require("jsonwebtoken");
 
 // Fonction d'inscription admin
 const adminSignUp = async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!username || !password) {
+    if (!email || !password) {
         return res.status(400).json({ message: "All fields are required" });
     }
 
-    const existingAdmin = await Admin.findOne({ username });
+    // Check if the email already exists
+    const existingAdmin = await Admin.findOne({ email });
 
     if (existingAdmin) {
-        return res.status(409).json({ message: "Admin already exists" });
+        return res.status(409).json({ message: "Admin with given email already exists" });
     }
 
-    const admin = new Admin({ username, password });
+    // Create new admin and hash the password
+    const admin = new Admin({ email, password });
     await admin.save();
 
     res.status(201).json({ message: "Admin registered successfully" });
@@ -24,13 +26,17 @@ const adminSignUp = async (req, res) => {
 
 // Fonction de connexion admin
 const adminLogin = async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    const admin = await Admin.findOne({ username });
+    // Find admin by email
+    const admin = await Admin.findOne({ email });
+
+    // Check if admin exists and if the password is correct
     if (!admin || !(await admin.isPasswordCorrect(password))) {
         return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // Generate access and refresh tokens
     const accessToken = admin.generateAccessToken();
     const refreshToken = admin.generateRefreshToken();
 

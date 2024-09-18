@@ -4,6 +4,7 @@ import Main from "./components/Main/Main.jsx";
 import Signup from "./components/Signup/Signup.jsx";
 import Login from "./components/Login/Login.jsx";
 import EmailVerify from "./components/EmailVerify/EmailVerify.jsx";
+import AdminDashboard from "./components/Admin/AdminDashboard.jsx";
 
 
 function App() {
@@ -16,7 +17,8 @@ function App() {
 			<Route path="/login" exact element={<Login />} />
 			<Route path="/" element={<Navigate replace to="/login" />} />
 			<Route path="/users/:id/verify/:token" element={<EmailVerify />} />
-		</Routes>
+			<Route path="/admindashboard" element={<AdminDashboard />} />
+					</Routes>
 	);
 }
 

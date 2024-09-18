@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const adminSchema = new mongoose.Schema({
-    username: {
+    email: {
         type: String,
         required: true,
         unique: true,
@@ -18,7 +18,7 @@ const adminSchema = new mongoose.Schema({
     },
 });
 
-// Méthode pour hacher le mot de passe avant de le sauvegarder
+// Hash password before saving admin
 adminSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
     const salt = await bcrypt.genSalt(10);
@@ -26,19 +26,19 @@ adminSchema.pre("save", async function (next) {
     next();
 });
 
-// Vérifier si le mot de passe est correct
+// Check if the password is correct
 adminSchema.methods.isPasswordCorrect = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Générer un jeton d'authentification
+// Generate access token
 adminSchema.methods.generateAccessToken = function () {
     return jwt.sign({ _id: this._id, role: this.role }, process.env.JWTPRIVATEKEY, {
         expiresIn: "1h",
     });
 };
 
-// Méthode pour générer un jeton JWT (refresh token)
+// Generate refresh token
 adminSchema.methods.generateRefreshToken = function () {
     return jwt.sign({ _id: this._id, role: this.role }, process.env.JWTPRIVATEKEY, {
         expiresIn: "7d",
