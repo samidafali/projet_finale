@@ -13,23 +13,31 @@ const Signup = () => {
 	const [error, setError] = useState("");
 	const [msg, setMsg] = useState("");
 
+	// Gérer les changements dans les champs du formulaire
 	const handleChange = ({ currentTarget: input }) => {
 		setData({ ...data, [input.name]: input.value });
+		// Effacer les messages d'erreur ou de succès si l'utilisateur modifie les champs
+		setError("");
+		setMsg("");
 	};
 
+	// Gérer la soumission du formulaire
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
 			const url = "http://localhost:8050/api/users";
 			const { data: res } = await axios.post(url, data);
-			setMsg(res.message);
+			setMsg(res.message); // Affiche le message de succès
+			setError(""); // Efface tout message d'erreur
 		} catch (error) {
+			// Vérifier les erreurs de réponse
 			if (
 				error.response &&
 				error.response.status >= 400 &&
 				error.response.status <= 500
 			) {
-				setError(error.response.data.message);
+				setError(error.response.data.message); // Affiche le message d'erreur
+				setMsg(""); // Efface tout message de succès
 			}
 		}
 	};
@@ -41,7 +49,7 @@ const Signup = () => {
 					<h1>Welcome Back</h1>
 					<Link to="/login">
 						<button type="button" className={styles.white_btn}>
-							Sing in
+							Sign In
 						</button>
 					</Link>
 				</div>
@@ -87,7 +95,7 @@ const Signup = () => {
 						{error && <div className={styles.error_msg}>{error}</div>}
 						{msg && <div className={styles.success_msg}>{msg}</div>}
 						<button type="submit" className={styles.green_btn}>
-							Sing Up
+							Sign Up
 						</button>
 					</form>
 				</div>
