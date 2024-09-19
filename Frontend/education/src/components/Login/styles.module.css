@@ -155,3 +155,88 @@
 	transform: translateY(-5px);
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Effet d'ombre lors du hover */
 }
+/* Container for the radio buttons */
+/* Container for the radio buttons */
+.role_container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.role_container label {
+    display: flex;
+    align-items: center;
+    margin: 0 20px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+/* Hide the default radio button */
+.role_container input[type="radio"] {
+    display: none;
+}
+
+/* Custom radio button design */
+.role_container input[type="radio"] + span {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.4s ease;
+    background: linear-gradient(135deg, #f0f0f0, #d9d9d9);
+}
+
+/* Checked state */
+.role_container input[type="radio"]:checked + span {
+    border-color: #007bff;
+    background: radial-gradient(circle at center, #007bff 40%, #333 100%);
+}
+
+/* Checked inner circle with animation */
+.role_container input[type="radio"]:checked + span::before {
+    content: "";
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+
+/* Hover effect */
+.role_container label:hover span {
+    border-color: #007bff;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); /* Light blue shadow */
+}
+
+/* Label hover effect */
+.role_container label:hover {
+    color: #007bff;
+}
+
+/* Custom animation for the checked effect */
+.role_container input[type="radio"]:checked + span::before {
+    animation: pulse 0.4s ease forwards;
+}
+
+/* Pulse effect on checked */
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}

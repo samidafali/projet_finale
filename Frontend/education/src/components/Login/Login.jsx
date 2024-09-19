@@ -5,36 +5,41 @@ import styles from "./styles.module.css";
 
 const Login = () => {
 	const [data, setData] = useState({ email: "", password: "" });
-	const [role, setRole] = useState("user");
+	const [role, setRole] = useState("user"); // Default role is user
 	const [error, setError] = useState("");
-	const [success, setSuccess] = useState(""); // Ajout d'un état pour les messages de succès
+	const [success, setSuccess] = useState(""); // State for success message
 
-	// Gérer les changements dans les champs du formulaire
+	// Handle form data change
 	const handleChange = ({ currentTarget: input }) => {
 		setData({ ...data, [input.name]: input.value });
-		setError(""); // Réinitialiser l'erreur en cas de modification
-		setSuccess(""); // Réinitialiser le succès en cas de modification
+		setError(""); // Clear error on input change
+		setSuccess(""); // Clear success on input change
 	};
 
-	// Gérer le changement du rôle (utilisateur ou admin)
+	// Handle role change (user, admin, teacher)
 	const handleRoleChange = (e) => {
 		setRole(e.target.value);
 	};
 
-	// Gérer la soumission du formulaire
+	// Handle form submission
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
+			// Select the correct URL based on role
 			const url = role === "admin"
 				? "http://localhost:8050/api/admin/login"
-				: "http://localhost:8050/api/auth/login";
+				: role === "teacher"
+				? "http://localhost:8050/api/teachers/login" // Teacher login endpoint
+				: "http://localhost:8050/api/auth/login"; // User login endpoint
+
 			const { data: res } = await axios.post(url, data);
 			localStorage.setItem("token", res.accessToken); // Store token
-			localStorage.setItem("role", role); // Store role as 'admin' or 'user'
+			localStorage.setItem("role", role); // Store role
+
 			setSuccess("Login successful!");
-	
+
 			// Redirect based on role
-			window.location = role === "admin" ? "/admindashboard" : "/";
+			window.location = role === "admin" ? "/admindashboard" : role === "teacher" ? "/teacherdashboard" : "/";
 		} catch (error) {
 			if (
 				error.response &&
@@ -46,7 +51,6 @@ const Login = () => {
 			}
 		}
 	};
-	
 
 	return (
 		<div className={styles.login_container}>
@@ -73,31 +77,42 @@ const Login = () => {
 							className={styles.input}
 						/>
 
-						{/* Sélection du rôle */}
+						{/* Role selection for User, Admin, or Teacher */}
 						<div className={styles.role_container}>
-							<label>
-								<input
-									type="radio"
-									name="role"
-									value="user"
-									checked={role === "user"}
-									onChange={handleRoleChange}
-								/>
-								User
-							</label>
-							<label>
-								<input
-									type="radio"
-									name="role"
-									value="admin"
-									checked={role === "admin"}
-									onChange={handleRoleChange}
-								/>
-								Admin
-							</label>
-						</div>
+    <label>
+        <input
+            type="radio"
+            name="role"
+            value="user"
+            checked={role === "user"}
+            onChange={handleRoleChange}
+        />
+        <span></span> User
+    </label>
+    <label>
+        <input
+            type="radio"
+            name="role"
+            value="admin"
+            checked={role === "admin"}
+            onChange={handleRoleChange}
+        />
+        <span></span> Admin
+    </label>
+    <label>
+        <input
+            type="radio"
+            name="role"
+            value="teacher"
+            checked={role === "teacher"}
+            onChange={handleRoleChange}
+        />
+        <span></span> Teacher
+    </label>
+</div>
 
-						{/* Messages de succès ou d'erreur */}
+
+						{/* Display success or error message */}
 						{error && <div className={styles.error_msg}>{error}</div>}
 						{success && <div className={styles.success_msg}>{success}</div>}
 

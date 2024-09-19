@@ -10,34 +10,37 @@ const Signup = () => {
 		email: "",
 		password: "",
 	});
+	const [role, setRole] = useState("user"); // Added role selection
 	const [error, setError] = useState("");
 	const [msg, setMsg] = useState("");
 
-	// Gérer les changements dans les champs du formulaire
+	// Handle input change
 	const handleChange = ({ currentTarget: input }) => {
 		setData({ ...data, [input.name]: input.value });
-		// Effacer les messages d'erreur ou de succès si l'utilisateur modifie les champs
-		setError("");
-		setMsg("");
+		setError(""); // Clear error
+		setMsg(""); // Clear message
 	};
 
-	// Gérer la soumission du formulaire
+	// Handle role change (user or teacher)
+	const handleRoleChange = (e) => {
+		setRole(e.target.value);
+	};
+
+	// Handle form submission
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const url = "http://localhost:8050/api/users";
+			const url = role === "teacher"
+				? "http://localhost:8050/api/teachers/register" // Teacher registration endpoint
+				: "http://localhost:8050/api/users"; // User registration endpoint
+
 			const { data: res } = await axios.post(url, data);
-			setMsg(res.message); // Affiche le message de succès
-			setError(""); // Efface tout message d'erreur
+			setMsg(res.message); // Display success message
+			setError(""); // Clear error
 		} catch (error) {
-			// Vérifier les erreurs de réponse
-			if (
-				error.response &&
-				error.response.status >= 400 &&
-				error.response.status <= 500
-			) {
-				setError(error.response.data.message); // Affiche le message d'erreur
-				setMsg(""); // Efface tout message de succès
+			if (error.response && error.response.status >= 400 && error.response.status <= 500) {
+				setError(error.response.data.message); // Display error message
+				setMsg(""); // Clear success message
 			}
 		}
 	};
@@ -92,8 +95,35 @@ const Signup = () => {
 							required
 							className={styles.input}
 						/>
+
+						{/* Role Selection: User or Teacher */}
+						<div className={styles.role_container}>
+							<label>
+								<input
+									type="radio"
+									name="role"
+									value="user"
+									checked={role === "user"}
+									onChange={handleRoleChange}
+								/>
+								User
+							</label>
+							<label>
+								<input
+									type="radio"
+									name="role"
+									value="teacher"
+									checked={role === "teacher"}
+									onChange={handleRoleChange}
+								/>
+								Teacher
+							</label>
+						</div>
+
+						{/* Display success or error message */}
 						{error && <div className={styles.error_msg}>{error}</div>}
 						{msg && <div className={styles.success_msg}>{msg}</div>}
+
 						<button type="submit" className={styles.green_btn}>
 							Sign Up
 						</button>

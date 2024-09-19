@@ -1,13 +1,22 @@
 import { Link } from "react-router-dom";
 import styles from "./styles.module.css";
-
+import axios from "axios";
 const Main = () => {
 	const role = localStorage.getItem("role"); // Assuming role is stored in localStorage after login
 
-	const handleLogout = () => {
-		localStorage.removeItem("token");
-		localStorage.removeItem("role");
-		window.location.reload();
+	const handleLogout = async () => {
+		try {
+			// API call to logout admin
+			await axios.post("http://localhost:8050/api/admin/logout");
+			// Remove token and role from localStorage
+			localStorage.removeItem("token");
+			localStorage.removeItem("role");
+			// Reload the page or redirect to login
+			window.location.href = "/login";
+		
+		} catch (error) {
+			console.error("Error logging out", error);
+		}
 	};
 
 	return (
