@@ -75,5 +75,14 @@ const verifyTeacherEmail = async (req, res) => {
     res.status(200).json({ message: "Email verified successfully" });
 };
 
+// Fonction de déconnexion pour les enseignants
+const teacherLogout = async (req, res) => {
+    try {
+        // Logique de déconnexion si nécessaire (par exemple, invalider le token côté serveur)
+        res.status(200).json({ message: "Teacher logged out successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error logging out", error: error.message });
+    }
+};
 
-module.exports = { teacherRegister, teacherLogin, verifyTeacherEmail };
+module.exports = { teacherRegister, teacherLogin, verifyTeacherEmail, teacherLogout };

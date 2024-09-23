@@ -23,10 +23,17 @@ const adminSignUp = async (req, res) => {
     }
 
     // Create new admin and hash the password
-    const admin = new Admin({ email, password });
+    const salt = await bcrypt.genSalt(Number(process.env.SALT));
+    const hashPassword = await bcrypt.hash(password, salt);
+
+    const admin = new Admin({ email, password: hashPassword });
     await admin.save();
 
-    res.status(201).json({ message: "Admin registered successfully" });
+    // Return the response with the adminId included
+    res.status(201).json({ 
+        message: "Admin registered successfully", 
+        adminId: admin._id // Inclure l'adminId dans la réponse
+    });
 };
 
 // Fonction de connexion admin
@@ -37,15 +44,21 @@ const adminLogin = async (req, res) => {
     const admin = await Admin.findOne({ email });
 
     // Check if admin exists and if the password is correct
-    if (!admin || !(await admin.isPasswordCorrect(password))) {
+    if (!admin || !(await bcrypt.compare(password, admin.password))) {
         return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Generate access and refresh tokens
-    const accessToken = admin.generateAccessToken();
-    const refreshToken = admin.generateRefreshToken();
+    // Generate access token
+    const accessToken = jwt.sign(
+        { _id: admin._id, role: 'admin' },
+        process.env.JWTPRIVATEKEY,
+        { expiresIn: '1h' }
+    );
 
-    res.status(200).json({ accessToken, refreshToken });
+    res.status(200).json({ 
+        accessToken, 
+        adminId: admin._id // Inclure l'adminId dans la réponse
+    });
 };
 
 // Fonction de déconnexion admin
@@ -90,7 +103,6 @@ const approveTeacher = asyncHandler(async (req, res) => {
 
     // Mise à jour du statut de l'enseignant
     const toApprove = req.body.isApproved;
-    const email = req.body.email;
     const remarks = req.body.remarks || null;
 
     if (!toApprove || (toApprove !== "approved" && toApprove !== "rejected" && toApprove !== "reupload")) {
@@ -100,6 +112,9 @@ const approveTeacher = asyncHandler(async (req, res) => {
     teacher.isApproved = toApprove;
     teacher.remarks = remarks;
     await teacher.save();
+
+    // Récupération de l'email de l'enseignant à partir de la base de données
+    const email = teacher.email;
 
     // Envoi de l'email
     await sendEmail(
@@ -119,5 +134,6 @@ const approveTeacher = asyncHandler(async (req, res) => {
 
     return res.status(200).json(new ApiResponse(200, teacher, `Teacher ${toApprove} successfully`));
 });
+
 
 module.exports = { adminSignUp, adminLogin, adminLogout, approveTeacher, getAllTeachers };

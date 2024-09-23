@@ -1,6 +1,7 @@
 import React from "react";
 import Main from "../Main/Main"; // Assuming Main is your navbar component
 import styles from "./styles.module.css";
+import AdminTeachers from "./AdminTeachers";
 
 const AdminDashboard = () => {
 	return (
@@ -9,6 +10,7 @@ const AdminDashboard = () => {
 		<div className={styles.dashboard_content}>
 		  <h1>Admin Dashboard</h1>
 		  <p>Welcome to the Admin Dashboard. Manage your data from here.</p>
+		  <AdminTeachers />
 		</div>
 	  </div>
 	);

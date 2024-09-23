@@ -29,29 +29,30 @@ const Login = () => {
 			const url = role === "admin"
 				? "http://localhost:8050/api/admin/login"
 				: role === "teacher"
-				? "http://localhost:8050/api/teachers/login" // Teacher login endpoint
+				? "http://localhost:8050/api/teachers/login"
 				: "http://localhost:8050/api/auth/login"; // User login endpoint
-
+	
 			const { data: res } = await axios.post(url, data);
 			localStorage.setItem("token", res.accessToken); // Store token
 			localStorage.setItem("role", role); // Store role
-
+	
+			// Store adminId if the role is admin
+			if (role === "admin") {
+				localStorage.setItem("adminId", res.adminId);
+			}
+	
 			setSuccess("Login successful!");
-
+	
 			// Redirect based on role
 			window.location = role === "admin" ? "/admindashboard" : role === "teacher" ? "/teacherdashboard" : "/";
 		} catch (error) {
-			if (
-				error.response &&
-				error.response.status >= 400 &&
-				error.response.status <= 500
-			) {
+			if (error.response && error.response.status >= 400 && error.response.status <= 500) {
 				setError(error.response.data.message);
 				setSuccess("");
 			}
 		}
 	};
-
+	
 	return (
 		<div className={styles.login_container}>
 			<div className={styles.login_form_container}>

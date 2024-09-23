@@ -53,3 +53,88 @@
 .logout_btn:hover {
 	background-color: #d32f2f;
 }
+/* Container principal */
+.teacher_container {
+    width: 90%;
+    margin: 2rem auto;
+    background-color: #f9f9f9;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Titre */
+.teacher_container h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    color: #333;
+}
+
+/* Table des enseignants */
+.teacher_table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+}
+
+.teacher_table th,
+.teacher_table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.teacher_table th {
+    background-color: #333;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.teacher_table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.teacher_table td {
+    color: #555;
+}
+
+/* Boutons d'approbation et de rejet */
+.approve_btn,
+.reject_btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 0.5rem;
+}
+
+.approve_btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.approve_btn:hover {
+    background-color: #45a049;
+}
+
+.reject_btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.reject_btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Message d'erreur */
+.error_msg {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 5px;
+    margin: 1rem 0;
+    text-align: center;
+}
