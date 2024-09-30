@@ -7,6 +7,8 @@ const userRoutes = require("./routes/users");
 const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 const teacherRoutes = require("./routes/teacher");
+const courseRoutes = require("./routes/course");
+
 // database connection
 connection();
 
@@ -27,6 +29,10 @@ app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/teachers", teacherRoutes);
+app.use("/api/courses", courseRoutes);
+
+
+
 
 const port = process.env.PORT || 8050;
 app.listen(port, console.log(`Listening on port ${port}...`));
