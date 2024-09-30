@@ -7,6 +7,10 @@ import EmailVerify from "./components/EmailVerify/EmailVerify.jsx";
 import AdminDashboard from "./components/Admin/AdminDashboard.jsx";
 import TeacherEmailVerify from "./components/EmailVerify/TeacherEmailVerify.jsx";
 import TeacherDashboard from "./components/Teacher/TeacherDashboard.jsx";
+import AdminCreateCourse from "./components/Admin/AdminCreateCourse .jsx";
+import AdminEnrollUser from "./components/Admin/AdminEnrollUser .jsx";
+import AdminAddTeacherToCourse from "./components/Admin/AdminAddTeacherToCourse .jsx";
+import AdminUpdateCourse from "./components/Admin/AdminUpdateCourse .jsx";
 
 
 function App() {
@@ -23,6 +27,16 @@ function App() {
 			<Route path="/admindashboard" element={<AdminDashboard />} />
 			<Route path="/teacherdashboard" element={<TeacherDashboard />} />
 
+{/* Admin Routes */}
+<Route path="/admin-dashboard" element={<AdminDashboard />} />
+  <Route path="/admin-create-course" element={<AdminCreateCourse />} />
+  <Route path="/admin-enroll-user" element={<AdminEnrollUser />} />
+  <Route path="/admin-add-teacher-to-course" element={<AdminAddTeacherToCourse />} />
+  <Route path="/admin-add-teacher" element={<AdminAddTeacherToCourse />} />
+  <Route path="/admin-update-course" element={<AdminUpdateCourse />} />
+
+
+  
 					</Routes>
 	);
 }

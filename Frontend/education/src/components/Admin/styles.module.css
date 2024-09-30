@@ -138,3 +138,452 @@
     margin: 1rem 0;
     text-align: center;
 }
+
+
+/* Main container for courses */
+.courses_container {
+    width: 90%;
+    margin: 2rem auto;
+    background-color: #f9f9f9;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Title styling */
+.courses_container h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    color: #333;
+    font-weight: bold;
+    border-bottom: 2px solid #00acee;
+    padding-bottom: 10px;
+}
+
+/* Courses list */
+.courses_list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Individual course items */
+.course_item {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.course_item:hover {
+    transform: translateY(-5px);
+}
+
+/* Course name styling */
+.course_item h3 {
+    font-size: 1.6rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+/* Course description and schedule */
+.course_item p {
+    color: #555;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* Button styling for actions (approve/delete) */
+.course_item button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
+
+/* Approve button */
+.course_item .approve_btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.course_item .approve_btn:hover {
+    background-color: #45a049;
+}
+
+/* Delete button */
+.course_item .delete_btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.course_item .delete_btn:hover {
+    background-color: #d32f2f;
+}
+
+/* No courses available message */
+.courses_container p {
+    text-align: center;
+    color: #999;
+    font-size: 1.2rem;
+    margin-top: 2rem;
+}
+
+/* Add some spacing and structure between elements */
+.courses_list li + li {
+    margin-top: 1.5rem;
+}
+
+
+/* Container for course update form */
+.update_course_container {
+    width: 80%;
+    margin: 2rem auto;
+    background-color: #f5f5f5;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Title styling */
+  .update_course_container h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    color: #333;
+    font-weight: bold;
+    border-bottom: 2px solid #00acee;
+    padding-bottom: 10px;
+  }
+  
+  /* Form inputs styling */
+  .update_course_container input[type="text"],
+  .update_course_container textarea {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1.2rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  
+  /* Focus state for inputs */
+  .update_course_container input[type="text"]:focus,
+  .update_course_container textarea:focus {
+    border-color: #00acee;
+    outline: none;
+  }
+  
+  /* Dropdown styling */
+  .update_course_container select {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1.2rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  
+  .update_course_container select:focus {
+    border-color: #00acee;
+    outline: none;
+  }
+  
+  /* Submit button styling */
+  .update_course_container button[type="submit"] {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .update_course_container button[type="submit"]:hover {
+    background-color: #45a049;
+  }
+  
+  /* Error message styling */
+  .error_msg {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 5px;
+    margin: 1rem 0;
+    text-align: center;
+  }
+  
+  /* Responsive design for mobile */
+  @media (max-width: 768px) {
+    .update_course_container {
+      width: 95%;
+      padding: 1.5rem;
+    }
+  }
+  
+  /* Dropdown styles */
+.dropdown_container {
+    margin-bottom: 1.2rem;
+}
+
+.dropdown {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.3s ease;
+}
+
+.dropdown:focus {
+    border-color: #00acee;
+    outline: none;
+}
+
+.label {
+    margin-bottom: 0.5rem;
+    display: block;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Submit button */
+.submit_button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit_button:hover {
+    background-color: #45a049;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .update_course_container {
+        width: 100%;
+        padding: 1.5rem;
+    }
+}
+
+.schedule_item {
+    margin-bottom: 10px;
+  }
+  
+  .schedule_input {
+    margin-right: 10px;
+  }
+  
+  .success_message {
+    color: green;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  /* Container for course creation form */
+.create_course_container {
+    width: 80%;
+    margin: 2rem auto;
+    background-color: #f9f9f9;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Title styling */
+.create_course_container h2 {
+    font-size: 2rem;
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+    border-bottom: 2px solid #00acee;
+    padding-bottom: 10px;
+}
+
+/* Form inputs styling */
+.create_course_container input[type="text"],
+.create_course_container textarea {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1.2rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+/* Focus state for inputs */
+.create_course_container input[type="text"]:focus,
+.create_course_container textarea:focus {
+    border-color: #00acee;
+    outline: none;
+}
+
+/* Dropdown styling */
+.create_course_container select {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1.2rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.create_course_container select:focus {
+    border-color: #00acee;
+    outline: none;
+}
+
+/* Submit button styling */
+.create_course_container button[type="submit"] {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.create_course_container button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Schedule section */
+.schedule_container {
+    margin-bottom: 1.2rem;
+}
+
+.schedule_container .schedule_item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.schedule_container .schedule_item input {
+    width: 30%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+}
+
+.schedule_container .schedule_item button {
+    padding: 0.5rem 1rem;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.schedule_container .schedule_item button:hover {
+    background-color: #d32f2f;
+}
+
+/* Add new schedule button */
+.add_schedule_btn {
+    padding: 0.5rem 1rem;
+    background-color: #00acee;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add_schedule_btn:hover {
+    background-color: #008bb9;
+}
+
+/* Error message styling */
+.error_msg {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 5px;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+/* Success message styling */
+.success_msg {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 5px;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    .create_course_container {
+        width: 95%;
+        padding: 1.5rem;
+    }
+
+    .schedule_container .schedule_item input {
+        width: 48%;
+    }
+}
+.success_message {
+    color: green;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  .approve_btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .approve_btn:hover {
+    background-color: #45a049;
+  }
+  
+  .reject_btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .reject_btn:hover {
+    background-color: #d32f2f;
+  }
+  

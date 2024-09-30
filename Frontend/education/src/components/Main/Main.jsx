@@ -1,20 +1,21 @@
-import { Link,useNavigate  } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 import axios from "axios";
+
 const Main = () => {
-    const role = localStorage.getItem("role"); // Récupérer le rôle depuis le localStorage après login
-    const navigate = useNavigate(); // Initialiser useNavigate
+    const role = localStorage.getItem("role"); // Get role from localStorage after login
+    const navigate = useNavigate(); // Initialize useNavigate
 
     const handleLogout = async () => {
         try {
-            const token = localStorage.getItem("token"); // Récupérer le token du localStorage
+            const token = localStorage.getItem("token"); // Retrieve token from localStorage
             if (!token) {
                 console.error("No token found, redirecting to login.");
-                navigate("/login"); // Rediriger si le token est manquant
+                navigate("/login"); // Redirect if token is missing
                 return;
             }
 
-            // Choisir l'URL de l'API en fonction du rôle
+            // Determine the API URL based on the role
             let logoutUrl = "";
             if (role === "admin") {
                 logoutUrl = "http://localhost:8050/api/admin/logout";
@@ -22,22 +23,22 @@ const Main = () => {
                 logoutUrl = "http://localhost:8050/api/teachers/logout";
             } else {
                 console.error("Invalid role, redirecting to login.");
-                navigate("/login"); // Rediriger pour un rôle invalide
+                navigate("/login"); // Redirect for an invalid role
                 return;
             }
 
-            // API call pour déconnecter l'utilisateur (admin ou enseignant)
+            // API call to log out the user (admin or teacher)
             await axios.post(logoutUrl, {}, {
                 headers: {
-                    Authorization: `Bearer ${token}` // Inclure le token dans les en-têtes
+                    Authorization: `Bearer ${token}` // Include token in headers
                 }
             });
 
-            // Supprimer le token et le rôle du localStorage
+            // Remove token and role from localStorage
             localStorage.removeItem("token");
             localStorage.removeItem("role");
 
-            // Rediriger vers la page de connexion
+            // Redirect to the login page
             navigate("/login");
         } catch (error) {
             console.error("Error logging out", error.response ? error.response.data : error.message);
@@ -48,7 +49,7 @@ const Main = () => {
         <div className={styles.main_container}>
             <nav className={styles.navbar}>
                 <div className={styles.logo}>
-                    <h1>Fakebook</h1>
+                    <h1>EduPlatform</h1>
                 </div>
                 <ul className={styles.nav_links}>
                     <li>
@@ -57,20 +58,32 @@ const Main = () => {
                     {role === "admin" && (
                         <>
                             <li>
-                                <Link to="/admin-dashboard">Dashboard</Link>
+                                <Link to="/admin-dashboard">Admin Dashboard</Link>
                             </li>
                             <li>
-                                <Link to="/manage-users">Manage Users</Link>
+                                <Link to="/admin-update-course">Update Courses</Link>
+                            </li>
+                            <li>
+                                <Link to="/admin-create-course">Create Course</Link>
+                            </li>
+                            <li>
+                                <Link to="/admin-enroll-user">Enroll User</Link>
+                            </li>
+                            <li>
+                                <Link to="/admin-add-teacher">Add Teacher</Link>
                             </li>
                         </>
                     )}
                     {role === "teacher" && (
                         <>
                             <li>
-                                <Link to="/teacher-dashboard">Dashboard</Link>
+                                <Link to="/teacher-dashboard">Teacher Dashboard</Link>
                             </li>
                             <li>
-                                <Link to="/profile">Profile</Link>
+                                <Link to="/teacher-courses">My Courses</Link>
+                            </li>
+                            <li>
+                                <Link to="/teacher-profile">Profile</Link>
                             </li>
                         </>
                     )}

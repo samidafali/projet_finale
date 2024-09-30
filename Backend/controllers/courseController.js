@@ -162,13 +162,12 @@ const deleteCourse = asyncHandler(async (req, res) => {
 // Approuver un cours (admin uniquement)
 const approveCourse = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { isapproved } = req.body;
-  
-  // This depends on how you're passing the admin in your middleware
-  const user = req.admin || req.user; // Adjust this based on your middleware setup
+  const { isapproved } = req.body;  // Expecting either `true` or `false` for approval status
+
+  const user = req.admin || req.user;
 
   if (!user || !checkRole(user, 'admin')) {
-    throw new ApiError(403, "You are not authorized to approve a course");
+    throw new ApiError(403, "You are not authorized to approve or reject a course");
   }
 
   if (typeof isapproved === 'undefined') {
@@ -185,8 +184,9 @@ const approveCourse = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, courseToApprove, `Course ${isapproved ? 'approved' : 'disapproved'} successfully`));
+    .json(new ApiResponse(200, courseToApprove, `Course ${isapproved ? 'approved' : 'rejected'} successfully`));
 });
+
 
 
 // Ajouter un enseignant à un cours

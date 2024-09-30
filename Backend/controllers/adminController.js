@@ -52,7 +52,7 @@ const adminLogin = async (req, res) => {
     const accessToken = jwt.sign(
         { _id: admin._id, role: 'admin' },
         process.env.JWTPRIVATEKEY,
-        { expiresIn: '1h' }
+        { expiresIn: '7d' }
     );
 
     res.status(200).json({ 

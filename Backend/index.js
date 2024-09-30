@@ -15,14 +15,12 @@ connection();
 // middlewares
 app.use(express.json());
 const corsOptions = {
-    origin: "http://localhost:3000", // Your frontend URL
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
-    credentials: true // If you need to allow cookies/auth headers
-  };
-  
-  app.use(cors(corsOptions));
-  
+  origin: 'http://localhost:3000', // The origin you want to allow
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Allow these methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
+};
+
+app.use(cors(corsOptions));
 
 // routes
 app.use("/api/users", userRoutes);
