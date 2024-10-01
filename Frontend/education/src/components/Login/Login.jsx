@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import styles from "./styles.module.css";
 
 const Login = () => {
@@ -31,20 +31,26 @@ const Login = () => {
 				: role === "teacher"
 				? "http://localhost:8050/api/teachers/login"
 				: "http://localhost:8050/api/auth/login"; // User login endpoint
-	
+
 			const { data: res } = await axios.post(url, data);
-			localStorage.setItem("token", res.accessToken); // Store token
+			localStorage.setItem("token", res.data.token); // Store token
 			localStorage.setItem("role", role); // Store role
-	
-			// Store adminId if the role is admin
-			if (role === "admin") {
-				localStorage.setItem("adminId", res.adminId);
+
+			// Store studentId if the role is user
+			if (role === "user") {
+				localStorage.setItem("studentId", res.data.studentId); // Make sure this is returned from the backend
 			}
-	
+
 			setSuccess("Login successful!");
-	
+
 			// Redirect based on role
-			window.location = role === "admin" ? "/admindashboard" : role === "teacher" ? "/teacherdashboard" : "/";
+			if (role === "admin") {
+				window.location = "/admindashboard";
+			} else if (role === "teacher") {
+				window.location = "/teacherdashboard";
+			} else {
+				window.location = "/studentdashboard"; // Redirect for user role
+			}
 		} catch (error) {
 			if (error.response && error.response.status >= 400 && error.response.status <= 500) {
 				setError(error.response.data.message);
@@ -52,7 +58,7 @@ const Login = () => {
 			}
 		}
 	};
-	
+
 	return (
 		<div className={styles.login_container}>
 			<div className={styles.login_form_container}>
@@ -80,38 +86,37 @@ const Login = () => {
 
 						{/* Role selection for User, Admin, or Teacher */}
 						<div className={styles.role_container}>
-    <label>
-        <input
-            type="radio"
-            name="role"
-            value="user"
-            checked={role === "user"}
-            onChange={handleRoleChange}
-        />
-        <span></span> User
-    </label>
-    <label>
-        <input
-            type="radio"
-            name="role"
-            value="admin"
-            checked={role === "admin"}
-            onChange={handleRoleChange}
-        />
-        <span></span> Admin
-    </label>
-    <label>
-        <input
-            type="radio"
-            name="role"
-            value="teacher"
-            checked={role === "teacher"}
-            onChange={handleRoleChange}
-        />
-        <span></span> Teacher
-    </label>
-</div>
-
+							<label>
+								<input
+									type="radio"
+									name="role"
+									value="user"
+									checked={role === "user"}
+									onChange={handleRoleChange}
+								/>
+								<span></span> User
+							</label>
+							<label>
+								<input
+									type="radio"
+									name="role"
+									value="admin"
+									checked={role === "admin"}
+									onChange={handleRoleChange}
+								/>
+								<span></span> Admin
+							</label>
+							<label>
+								<input
+									type="radio"
+									name="role"
+									value="teacher"
+									checked={role === "teacher"}
+									onChange={handleRoleChange}
+								/>
+								<span></span> Teacher
+							</label>
+						</div>
 
 						{/* Display success or error message */}
 						{error && <div className={styles.error_msg}>{error}</div>}

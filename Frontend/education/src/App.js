@@ -11,6 +11,7 @@ import AdminCreateCourse from "./components/Admin/AdminCreateCourse .jsx";
 import AdminEnrollUser from "./components/Admin/AdminEnrollUser .jsx";
 import AdminAddTeacherToCourse from "./components/Admin/AdminAddTeacherToCourse .jsx";
 import AdminUpdateCourse from "./components/Admin/AdminUpdateCourse .jsx";
+import StudentDashboard from "./components/Student/StudentDashboard.jsx";
 
 
 function App() {
@@ -26,6 +27,8 @@ function App() {
 			<Route path="/teachers/:id/verify/:token" element={<TeacherEmailVerify />} />
 			<Route path="/admindashboard" element={<AdminDashboard />} />
 			<Route path="/teacherdashboard" element={<TeacherDashboard />} />
+			<Route path="/studentdashboard" element={<StudentDashboard />} />
+
 
 {/* Admin Routes */}
 <Route path="/admin-dashboard" element={<AdminDashboard />} />

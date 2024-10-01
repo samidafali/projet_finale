@@ -8,6 +8,8 @@ const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 const teacherRoutes = require("./routes/teacher");
 const courseRoutes = require("./routes/course");
+const studentRoutes = require("./routes/student");
+
 
 // database connection
 connection();
@@ -28,6 +30,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/teachers", teacherRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/students", studentRoutes);
+
 
 
 

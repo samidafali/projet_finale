@@ -4,7 +4,7 @@ const { Course } = require("../models/course.js");
 const { asyncHandler } = require("../utils/asyncHandler.js");
 const { ApiError } = require("../utils/ApiError.js"); 
 const { ApiResponse } = require("../utils/ApiResponse.js");
-const Teacher = require("../models/teacher");
+const Teacher = require("../models/teacher.js");
 const { User } = require("../models/user.js"); 
 const sendMail = require("../utils/sendEmail.js");
 
