@@ -15,7 +15,6 @@ import AdminAddTeacherToCourse from "./components/Admin/AdminAddTeacherToCourse 
 import AdminUpdateCourse from "./components/Admin/AdminUpdateCourse .jsx";
 import StudentDashboard from "./components/Student/StudentDashboard.jsx";
 
-
 function App() {
 	const user = localStorage.getItem("token");
 
