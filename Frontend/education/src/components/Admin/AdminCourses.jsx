@@ -9,7 +9,7 @@ const AdminCourses = () => {
   // Fetch all courses on component mount
   useEffect(() => {
     axios
-      .get("http://localhost:8050/api/courses", {
+      .get("http://localhost:8050/api/courses/admin/all", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       })
       .then((response) => {

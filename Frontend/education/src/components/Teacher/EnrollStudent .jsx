@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Main from "../Main/Main"; // Assuming Main is your navbar component
+//import Main from "../Main/Main"; // Assuming Main is your navbar component
 
 const EnrollStudent = () => {
   const [courses, setCourses] = useState([]); // Liste des cours
@@ -57,7 +57,7 @@ const EnrollStudent = () => {
 
   return (
     <div>
-      <Main />
+      
       <h2>Enroll a Student in a Course</h2>
 
       {/* Dropdown pour sélectionner un cours */}

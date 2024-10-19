@@ -16,6 +16,7 @@ const router = express.Router();
 
 // Routes publiques
 router.get("/", getAllCourses);
+router.get("/admin/all", adminAuth, getAllCourses);
 router.get("/:id", getCourseById);
 
 // Routes protégées par les rôles (admins and teachers)

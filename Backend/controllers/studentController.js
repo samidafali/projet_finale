@@ -3,20 +3,20 @@ const { ApiError } = require("../utils/ApiError");
 const { ApiResponse } = require("../utils/ApiResponse");
 const asyncHandler = require("express-async-handler");
 
-// Récupérer tous les étudiants
+// Fetch all students
 const getAllStudents = asyncHandler(async (req, res) => {
-    const students = await User.find(); // Récupère tous les utilisateurs
+    const students = await User.find(); // Fetch all users
     if (!students || students.length === 0) {
         return res.status(404).json(new ApiResponse(404, null, "No students found"));
     }
     res.status(200).json(new ApiResponse(200, students, "Students retrieved successfully"));
 });
 
-// Mettre à jour les informations d'un étudiant
+// Update student information
 const updateStudent = asyncHandler(async (req, res) => {
     const { id } = req.params; // Student ID from URL parameters
 
-    // Vérifier si l'ID de l'étudiant correspond à l'utilisateur connecté
+    // Check if the student ID matches the logged-in user
     if (req.student._id.toString() !== id) {
         return res.status(403).json({ message: "You are not authorized to update this profile" });
     }
@@ -36,11 +36,11 @@ const updateStudent = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, student, "Student updated successfully"));
 });
 
-// Supprimer un étudiant
+// Delete a student
 const deleteStudent = asyncHandler(async (req, res) => {
     const { id } = req.params; // Student ID from URL parameters
 
-    // Vérifier si l'ID de l'étudiant correspond à l'utilisateur connecté
+    // Check if the student ID matches the logged-in user
     if (req.student._id.toString() !== id) {
         return res.status(403).json({ message: "You are not authorized to delete this profile" });
     }
@@ -52,11 +52,21 @@ const deleteStudent = asyncHandler(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, null, "Student deleted successfully"));
 });
+// In studentController.js
+const getStudentById = asyncHandler(async (req, res) => {
+    const { id } = req.params; // Student ID from URL parameters
+    const student = await User.findById(id);
 
+    if (!student) {
+        return res.status(404).json(new ApiResponse(404, null, "Student not found"));
+    }
+    res.status(200).json(new ApiResponse(200, student, "Student retrieved successfully"));
+});
 
-// Exporter les fonctions
+// Export functions
 module.exports = {
     getAllStudents,
     updateStudent,
     deleteStudent,
+    getStudentById,
 };

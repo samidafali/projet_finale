@@ -18,13 +18,27 @@ const checkRole = (user, role) => {
 
 
 // Récupérer tous les cours approuvés
+// Récupérer tous les cours
 const getAllCourses = asyncHandler(async (req, res) => {
-  const courses = await Course.find({ isapproved: true });
+  const user = req.admin || req.teacher || req.user; // Récupérer l'utilisateur connecté
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, courses, "All approved courses fetched successfully"));
+  let courses;
+
+  // Si l'utilisateur est un administrateur, renvoyer tous les cours
+  if (user && checkRole(user, 'admin')) {
+    courses = await Course.find().populate('enrolledteacher', 'firstName lastName email');
+    return res
+      .status(200)
+      .json(new ApiResponse(200, courses, "All courses fetched successfully"));
+  } else {
+    // Sinon, renvoyer uniquement les cours approuvés
+    courses = await Course.find({ isapproved: true }).populate('enrolledteacher', 'firstName lastName email');
+    return res
+      .status(200)
+      .json(new ApiResponse(200, courses, "Approved courses fetched successfully"));
+  }
 });
+
 
 // Récupérer les détails d'un cours spécifique par ID
 const getCourseById = asyncHandler(async (req, res) => {
@@ -49,37 +63,60 @@ const createCourse = asyncHandler(async (req, res) => {
   console.log("Utilisateur connecté:", user); // Log the connected user
 
   if (!user) {
-      throw new ApiError(403, "User not found or role is not defined");
+    throw new ApiError(403, "User not found or role is not defined");
   }
 
-  const { coursename, description, schedule, enrolledteacher } = req.body;
+  const { coursename, description, schedule } = req.body;
+  let { enrolledteacher } = req.body; // Enrolled teacher may or may not be provided
 
-  // Check if the enrolledteacher is a valid ObjectId
-  if (!mongoose.Types.ObjectId.isValid(enrolledteacher)) {
-      throw new ApiError(400, "Invalid teacher ID format");
+  // Vérifier les champs requis
+  if (!coursename || !description || !schedule) {
+    throw new ApiError(400, "All fields (coursename, description, schedule) are required");
   }
 
-  if (!coursename || !description || !schedule || !enrolledteacher) {
-      throw new ApiError(400, "All fields are required");
-  }
-
-  // Vérifier si l'utilisateur est un administrateur
+  // Si l'utilisateur est un administrateur
   if (checkRole(user, 'admin')) {
-      const newCourse = await Course.create({
-          coursename,
-          description,
-          schedule,
-          enrolledteacher,
-          isapproved: true // Automatically approve since it's created by admin
-      });
+    if (!enrolledteacher) {
+      throw new ApiError(400, "enrolledteacher is required for admin to create a course");
+    }
 
-      return res
-          .status(201)
-          .json(new ApiResponse(201, newCourse, "New course created successfully and approved."));
+    // Vérifier si le format de l'ID de l'enseignant est valide
+    if (!mongoose.Types.ObjectId.isValid(enrolledteacher)) {
+      throw new ApiError(400, "Invalid teacher ID format");
+    }
+
+    const newCourse = await Course.create({
+      coursename,
+      description,
+      schedule,
+      enrolledteacher,
+      isapproved: true // Automatically approve since it's created by admin
+    });
+
+    return res
+      .status(201)
+      .json(new ApiResponse(201, newCourse, "New course created successfully and approved."));
+  }
+  // Si l'utilisateur est un enseignant
+  else if (checkRole(user, 'teacher')) {
+    enrolledteacher = user._id; // Assign the logged-in teacher's ID
+
+    const newCourse = await Course.create({
+      coursename,
+      description,
+      schedule,
+      enrolledteacher,
+      isapproved: false // Course needs to be approved by admin
+    });
+
+    return res
+      .status(201)
+      .json(new ApiResponse(201, newCourse, "New course created successfully and pending approval."));
   } else {
-      throw new ApiError(403, "You are not authorized to create a course");
+    throw new ApiError(403, "You are not authorized to create a course");
   }
 });
+
 
 
 // Mettre à jour les informations d'un cours (Admin ou Teacher qui a créé le cours)
@@ -98,15 +135,11 @@ const updateCourse = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Course not found or could not be updated");
   }
 
-  console.log("Course Enrolled Teacher ID from Course:", existingCourse.enrolledteacher.toString());
-  console.log("Logged-in User (Teacher/Admin) ID:", user._id.toString());
-
   if (checkRole(user, 'admin')) {
     console.log("User is an admin, authorized to update");
   } else if (checkRole(user, 'teacher') && existingCourse.enrolledteacher.toString() === user._id.toString()) {
     console.log("Teacher is authorized to update their own course");
   } else {
-    console.log("Access denied: user is not authorized to update the course");
     throw new ApiError(403, "Access denied, you are not authorized to update this course");
   }
 
@@ -117,13 +150,12 @@ const updateCourse = asyncHandler(async (req, res) => {
     isapproved,
   };
 
-  // Ensure the enrolledteacher field is treated as an array of ObjectId
+  // Vérification de l'ID de l'enseignant
   if (enrolledteacher) {
-    await Course.findByIdAndUpdate(
-      id,
-      { $addToSet: { enrolledteacher: new mongoose.Types.ObjectId(enrolledteacher) } }, // Fix here
-      { new: true }
-    );
+    if (!mongoose.Types.ObjectId.isValid(enrolledteacher)) {
+      throw new ApiError(400, "Invalid teacher ID format");
+    }
+    updateFields.enrolledteacher = new mongoose.Types.ObjectId(enrolledteacher); // Assurez-vous que c'est un ObjectId valide
   }
 
   const updatedCourse = await Course.findByIdAndUpdate(
@@ -134,6 +166,8 @@ const updateCourse = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, updatedCourse, "Course updated successfully"));
 });
+
+
 
 
 

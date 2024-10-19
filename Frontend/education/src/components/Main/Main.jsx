@@ -80,10 +80,10 @@ const Main = () => {
                                 <Link to="/teacher-dashboard">Teacher Dashboard</Link>
                             </li>
                             <li>
-                                <Link to="/teacher-courses">My Courses</Link>
+                                <Link to="/teacher-update-course">Update Courses</Link>
                             </li>
                             <li>
-                                <Link to="/teacher-profile">Profile</Link>
+                                <Link to="/teacher-create-course">create course</Link>
                             </li>
                         </>
                     )}

@@ -10,7 +10,7 @@ const Signup = () => {
 		email: "",
 		password: "",
 	});
-	const [role, setRole] = useState("user"); // Added role selection
+	const [role, setRole] = useState("user"); // Default role
 	const [error, setError] = useState("");
 	const [msg, setMsg] = useState("");
 
@@ -21,7 +21,7 @@ const Signup = () => {
 		setMsg(""); // Clear message
 	};
 
-	// Handle role change (user or teacher)
+	// Handle role change
 	const handleRoleChange = (e) => {
 		setRole(e.target.value);
 	};
@@ -31,19 +31,23 @@ const Signup = () => {
 		e.preventDefault();
 		try {
 			const url = role === "teacher"
-				? "http://localhost:8050/api/teachers/register" // Teacher registration endpoint
-				: "http://localhost:8050/api/users"; // User registration endpoint
-
-			const { data: res } = await axios.post(url, data);
+				? "http://localhost:8050/api/teachers/register"
+				: "http://localhost:8050/api/auth/register";
+	
+			const { data: res } = await axios.post(url, { ...data, role });
 			setMsg(res.message); // Display success message
 			setError(""); // Clear error
 		} catch (error) {
-			if (error.response && error.response.status >= 400 && error.response.status <= 500) {
-				setError(error.response.data.message); // Display error message
+			if (error.response && error.response.status === 409) {
+				setError("User already exists. Please log in or use a different email.");
+				setMsg(""); // Clear success message
+			} else if (error.response && error.response.status >= 400 && error.response.status <= 500) {
+				setError(error.response.data.message);
 				setMsg(""); // Clear success message
 			}
 		}
 	};
+	
 
 	return (
 		<div className={styles.signup_container}>
@@ -120,7 +124,7 @@ const Signup = () => {
 							</label>
 						</div>
 
-						{/* Display success or error message */}
+						{/* Display messages */}
 						{error && <div className={styles.error_msg}>{error}</div>}
 						{msg && <div className={styles.success_msg}>{msg}</div>}
 

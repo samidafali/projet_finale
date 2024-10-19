@@ -22,42 +22,56 @@ const Login = () => {
 	};
 
 	// Handle form submission
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		try {
-			// Select the correct URL based on role
-			const url = role === "admin"
-				? "http://localhost:8050/api/admin/login"
-				: role === "teacher"
-				? "http://localhost:8050/api/teachers/login"
-				: "http://localhost:8050/api/auth/login"; // User login endpoint
+// Handle form submission
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+        // Select the correct URL based on role
+        const url =
+            role === "admin"
+                ? "http://localhost:8050/api/admin/login"
+                : role === "teacher"
+                ? "http://localhost:8050/api/teachers/login"
+                : "http://localhost:8050/api/auth/login"; // User login endpoint
 
-			const { data: res } = await axios.post(url, data);
-			localStorage.setItem("token", res.data.token); // Store token
-			localStorage.setItem("role", role); // Store role
+        const response = await axios.post(url, data);
+        const resData = response.data;
 
-			// Store studentId if the role is user
-			if (role === "user") {
-				localStorage.setItem("studentId", res.data.studentId); // Make sure this is returned from the backend
-			}
+        // Store the token and role in localStorage
+        localStorage.setItem("token", resData.accessToken); // Store accessToken
+        localStorage.setItem("role", role); // Store role
 
-			setSuccess("Login successful!");
+        // Store the ID based on role
+        if (role === "admin") {
+            localStorage.setItem("adminId", resData.adminId);
+        } else if (role === "teacher") {
+            localStorage.setItem("teacherId", resData.teacherId);
+        } else if (role === "user") {
+            localStorage.setItem("studentId", resData.studentId);
+        }
 
-			// Redirect based on role
-			if (role === "admin") {
-				window.location = "/admindashboard";
-			} else if (role === "teacher") {
-				window.location = "/teacherdashboard";
-			} else {
-				window.location = "/studentdashboard"; // Redirect for user role
-			}
-		} catch (error) {
-			if (error.response && error.response.status >= 400 && error.response.status <= 500) {
-				setError(error.response.data.message);
-				setSuccess("");
-			}
-		}
-	};
+        setSuccess("Login successful!");
+
+        // Redirect based on role
+        if (role === "admin") {
+            window.location = "/admindashboard";
+        } else if (role === "teacher") {
+            window.location = "/teacher-dashboard";
+        } else {
+            window.location = "/studentdashboard"; // Redirect for user role
+        }
+    } catch (error) {
+        if (
+            error.response &&
+            error.response.status >= 400 &&
+            error.response.status <= 500
+        ) {
+            setError(error.response.data.message);
+            setSuccess("");
+        }
+    }
+};
+
 
 	return (
 		<div className={styles.login_container}>

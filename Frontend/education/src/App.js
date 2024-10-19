@@ -7,6 +7,8 @@ import EmailVerify from "./components/EmailVerify/EmailVerify.jsx";
 import AdminDashboard from "./components/Admin/AdminDashboard.jsx";
 import TeacherEmailVerify from "./components/EmailVerify/TeacherEmailVerify.jsx";
 import TeacherDashboard from "./components/Teacher/TeacherDashboard.jsx";
+import TeacherCreateCourse from "./components/Teacher/TeacherCreateCourse .jsx"
+import UpdateCourse from "./components/Teacher/UpdateCourse.jsx";
 import AdminCreateCourse from "./components/Admin/AdminCreateCourse .jsx";
 import AdminEnrollUser from "./components/Admin/AdminEnrollUser .jsx";
 import AdminAddTeacherToCourse from "./components/Admin/AdminAddTeacherToCourse .jsx";
@@ -26,8 +28,10 @@ function App() {
 			<Route path="/users/:id/verify/:token" element={<EmailVerify />} />
 			<Route path="/teachers/:id/verify/:token" element={<TeacherEmailVerify />} />
 			<Route path="/admindashboard" element={<AdminDashboard />} />
-			<Route path="/teacherdashboard" element={<TeacherDashboard />} />
+			<Route path="/teacher-dashboard" element={<TeacherDashboard />} />
 			<Route path="/studentdashboard" element={<StudentDashboard />} />
+			<Route path="/teacher-create-course" element={<TeacherCreateCourse />} />
+			<Route path="/teacher-update-course" element={<UpdateCourse/>} />
 
 
 {/* Admin Routes */}

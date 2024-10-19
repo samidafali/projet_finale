@@ -8,5 +8,5 @@ router.get("/:id/verify/:token", verifyEmail);
 // Route pour l'inscription (peut aussi être déplacée vers le fichier authRoutes.js)
 router.post("/", register);
 
-
+router.post("/login", login); // User login endpoint
 module.exports = router;
