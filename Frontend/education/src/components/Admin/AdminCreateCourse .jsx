@@ -14,6 +14,8 @@ const AdminCreateCourse = () => {
 
   const [newSchedule, setNewSchedule] = useState({ day: "", starttime: "", endtime: "" }); // New schedule entry
   const [successMessage, setSuccessMessage] = useState(""); // State for success message
+  const [image, setImage] = useState(null); // State to store selected image
+  const [videos, setVideos] = useState([{ title: "", file: null }]); // State to store selected videos with titles
 
   // Handle input changes for course name, description, etc.
   const handleChange = (e) => {
@@ -42,20 +44,56 @@ const AdminCreateCourse = () => {
     }
   };
 
+  // Handle image upload
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]); // Set selected image file
+  };
+
+  // Handle video change with title input
+  const handleVideoChange = (index, field, value) => {
+    const updatedVideos = [...videos];
+    updatedVideos[index][field] = value;
+    setVideos(updatedVideos);
+  };
+
+  // Add more video fields
+  const addVideoInputs = () => {
+    setVideos([...videos, { title: "", file: null }]);
+  };
+
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("coursename", courseData.coursename);
+    formData.append("description", courseData.description);
+    formData.append("enrolledteacher", courseData.enrolledteacher);
+    formData.append("schedule", JSON.stringify(courseData.schedule));
+
+    // Append image if selected
+    if (image) {
+      formData.append("image", image);
+    }
+
+    // Append videos and titles
+    videos.forEach((video, index) => {
+      if (video.file) {
+        formData.append(`videos`, video.file);
+        formData.append(`videoTitles[]`, video.title); // Append the corresponding title
+      }
+    });
+
     axios
-      .post(
-        "http://localhost:8050/api/courses", 
-        courseData, 
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } // Add the Authorization header
-        }
-      )
+      .post("http://localhost:8050/api/courses", formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then((response) => {
         console.log("Course created successfully:", response.data);
-        setSuccessMessage("Course created successfully!"); // Set success message
+        setSuccessMessage("Course created successfully!");
       })
       .catch((error) => {
         console.error("Error creating course:", error);
@@ -69,9 +107,7 @@ const AdminCreateCourse = () => {
         <h2>Create a New Course</h2>
 
         {/* Display success message if exists */}
-        {successMessage && (
-          <p className={styles.success_message}>{successMessage}</p>
-        )}
+        {successMessage && <p className={styles.success_message}>{successMessage}</p>}
 
         <form onSubmit={handleSubmit}>
           <input
@@ -80,18 +116,20 @@ const AdminCreateCourse = () => {
             placeholder="Course Name"
             value={courseData.coursename}
             onChange={handleChange}
+            required
           />
           <textarea
             name="description"
             placeholder="Course Description"
             value={courseData.description}
             onChange={handleChange}
+            required
           />
 
           {/* Teacher Dropdown */}
-          <TeacherDropdown 
-            selectedTeacher={courseData.enrolledteacher} 
-            onSelect={handleTeacherSelect} 
+          <TeacherDropdown
+            selectedTeacher={courseData.enrolledteacher}
+            onSelect={handleTeacherSelect}
           />
 
           {/* Schedule input */}
@@ -129,6 +167,38 @@ const AdminCreateCourse = () => {
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* Image input */}
+          <div className={styles.file_input}>
+            <label htmlFor="image">Course Image</label>
+            <input type="file" id="image" name="image" accept="image/*" onChange={handleImageChange} />
+          </div>
+
+          {/* Video inputs */}
+          <div className={styles.video_inputs_container}>
+            <h3>Course Videos</h3>
+            {videos.map((video, index) => (
+              <div key={index} className={styles.video_input_item}>
+                <input
+                  type="text"
+                  placeholder={`Video Title ${index + 1}`}
+                  value={video.title}
+                  onChange={(e) => handleVideoChange(index, "title", e.target.value)}
+                />
+                <input
+                  type="file"
+                  name="videos[]"
+                  accept="video/*"
+                  onChange={(e) => handleVideoChange(index, "file", e.target.files[0])}
+                />
+              </div>
+            ))}
+            {videos.length < 5 && (
+              <button type="button" onClick={addVideoInputs} className={styles.add_video_btn}>
+                Add Another Video
+              </button>
+            )}
           </div>
 
           <button type="submit">Create Course</button>

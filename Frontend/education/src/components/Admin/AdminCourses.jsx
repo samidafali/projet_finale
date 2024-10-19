@@ -14,7 +14,7 @@ const AdminCourses = () => {
       })
       .then((response) => {
         console.log("Courses fetched:", response.data.data);
-        setCourses(response.data.data); // Assuming courses are in response.data.data
+        setCourses(response.data.data || []); // Ensure courses is an array
       })
       .catch((error) => {
         console.error("Error fetching courses:", error);
@@ -31,15 +31,12 @@ const AdminCourses = () => {
       )
       .then((response) => {
         console.log(`Course ${isapproved ? 'approved' : 'rejected'} successfully`);
-        // Update the course status in the UI
         setCourses((prevCourses) =>
           prevCourses.map((course) =>
             course._id === courseId ? { ...course, isapproved } : course
           )
         );
-        // Set success message
         setSuccessMessage(`Course ${isapproved ? 'approved' : 'rejected'} successfully!`);
-        // Clear the success message after 3 seconds
         setTimeout(() => setSuccessMessage(""), 3000);
       })
       .catch((error) => {
@@ -55,11 +52,8 @@ const AdminCourses = () => {
       })
       .then((response) => {
         console.log("Course deleted successfully");
-        // Set success message
         setSuccessMessage("Course deleted successfully!");
-        // Remove the deleted course from the list
         setCourses(courses.filter((course) => course._id !== courseId));
-        // Clear the success message after 3 seconds
         setTimeout(() => setSuccessMessage(""), 3000);
       })
       .catch((error) => {
@@ -72,9 +66,7 @@ const AdminCourses = () => {
       <h2>All Courses</h2>
 
       {/* Success message */}
-      {successMessage && (
-        <p className={styles.success_message}>{successMessage}</p>
-      )}
+      {successMessage && <p className={styles.success_message}>{successMessage}</p>}
 
       {courses.length > 0 ? (
         <ul className={styles.courses_list}>
@@ -90,7 +82,28 @@ const AdminCourses = () => {
               </p>
               <p>Approved: {course.isapproved ? "Yes" : "No"}</p>
 
-              {/* Approve and Reject buttons (visible for all courses) */}
+              {/* Display the course image */}
+              {course.imageUrl && (
+                <div>
+                  <h4>Course Image:</h4>
+                  <img src={course.imageUrl} alt="Course" className={styles.course_image} />
+                </div>
+              )}
+
+              {/* Display course videos, if videoUrls is not undefined */}
+              {course.videos && course.videos.length > 0 && (
+                <div>
+                  <h4>Course Videos:</h4>
+                  {course.videos.map((video, index) => (
+                    <div key={index}>
+                      <p>{video.title}</p>
+                      <video key={index} src={video.url} controls width="300" />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Approve and Reject buttons */}
               <div>
                 <button
                   onClick={() => handleApproveReject(course._id, true)}
@@ -106,6 +119,7 @@ const AdminCourses = () => {
                 </button>
               </div>
 
+              {/* Delete button */}
               <button onClick={() => handleDelete(course._id)} className={styles.delete_btn}>
                 Delete Course
               </button>

@@ -10,9 +10,16 @@ const courseSchema = new mongoose.Schema({
   coursename: { type: String, required: true },
   description: { type: String, required: true },
   schedule: [scheduleSchema], // Programme des cours
-  enrolledteacher: [{ type: mongoose.Schema.Types.ObjectId, ref: "Teacher" }], // Change this to an array// Enseignant associé
+  enrolledteacher: [{ type: mongoose.Schema.Types.ObjectId, ref: "Teacher" }], // Enseignant associé
   enrolledUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Utilisateurs inscrits
   isapproved: { type: Boolean, default: false }, // Statut d'approbation du cours
+  imageUrl: { type: String }, // Image URL for the course
+  videos: [ // Videos array containing video URLs and titles
+    {
+      url: { type: String },
+      title: { type: String }
+    }
+  ]
 });
 
 const Course = mongoose.model("Course", courseSchema);

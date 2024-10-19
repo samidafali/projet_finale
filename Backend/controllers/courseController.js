@@ -7,7 +7,9 @@ const { ApiResponse } = require("../utils/ApiResponse.js");
 const Teacher = require("../models/teacher.js");
 const { User } = require("../models/user.js"); 
 const sendMail = require("../utils/sendEmail.js");
-
+const cloudinary = require("../utils/cloudinary");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 // Vérifier le rôle d'un utilisateur (Admin ou Teacher)
 const checkRole = (user, role) => {
   if (!user || !user.role) {
@@ -58,64 +60,63 @@ const getCourseById = asyncHandler(async (req, res) => {
 // Créer un nouveau cours (Admin ou Teacher)
 // Créer un nouveau cours (Admin ou Teacher)
 const createCourse = asyncHandler(async (req, res) => {
-  const user = req.admin || req.teacher; // Admin or teacher
+  try {
+    const user = req.admin || req.teacher;
+    if (!user) {
+      throw new ApiError(403, "User not found or role is not defined");
+    }
 
-  console.log("Utilisateur connecté:", user); // Log the connected user
+    const { coursename, description, schedule, videoTitles } = req.body;
+    let { enrolledteacher } = req.body;
 
-  if (!user) {
-    throw new ApiError(403, "User not found or role is not defined");
-  }
+    // Initialize variables for uploaded files
+    let imageUrl = null;
+    let videos = [];
 
-  const { coursename, description, schedule } = req.body;
-  let { enrolledteacher } = req.body; // Enrolled teacher may or may not be provided
+    // Handle image upload
+    if (req.files && req.files.image) {
+      const imageResult = await cloudinary.uploader.upload(req.files.image[0].path, {
+        folder: "courses",
+        resource_type: "image",
+      });
+      imageUrl = imageResult.secure_url;
+    }
 
-  // Vérifier les champs requis
-  if (!coursename || !description || !schedule) {
-    throw new ApiError(400, "All fields (coursename, description, schedule) are required");
-  }
+    // Handle video uploads with titles
+    if (req.files && req.files.videos) {
+      for (let i = 0; i < req.files.videos.length; i++) {
+        const video = req.files.videos[i];
+        const videoResult = await cloudinary.uploader.upload(video.path, {
+          folder: "courses/videos",
+          resource_type: "video",
+        });
+        videos.push({ url: videoResult.secure_url, title: videoTitles[i] });
+      }
+    }
 
-  // Si l'utilisateur est un administrateur
-  if (checkRole(user, 'admin')) {
+    // Check role and create the course accordingly
     if (!enrolledteacher) {
-      throw new ApiError(400, "enrolledteacher is required for admin to create a course");
-    }
-
-    // Vérifier si le format de l'ID de l'enseignant est valide
-    if (!mongoose.Types.ObjectId.isValid(enrolledteacher)) {
-      throw new ApiError(400, "Invalid teacher ID format");
+      throw new ApiError(400, "Enrolled teacher is required.");
     }
 
     const newCourse = await Course.create({
       coursename,
       description,
-      schedule,
+      schedule: JSON.parse(schedule),
       enrolledteacher,
-      isapproved: true // Automatically approve since it's created by admin
+      imageUrl,
+      videos,
+      isapproved: true
     });
 
-    return res
-      .status(201)
-      .json(new ApiResponse(201, newCourse, "New course created successfully and approved."));
-  }
-  // Si l'utilisateur est un enseignant
-  else if (checkRole(user, 'teacher')) {
-    enrolledteacher = user._id; // Assign the logged-in teacher's ID
-
-    const newCourse = await Course.create({
-      coursename,
-      description,
-      schedule,
-      enrolledteacher,
-      isapproved: false // Course needs to be approved by admin
-    });
-
-    return res
-      .status(201)
-      .json(new ApiResponse(201, newCourse, "New course created successfully and pending approval."));
-  } else {
-    throw new ApiError(403, "You are not authorized to create a course");
+    return res.status(201).json(new ApiResponse(201, newCourse, "New course created successfully."));
+  } catch (error) {
+    console.error("Error creating course:", error);
+    return res.status(500).json({ message: "Internal Server Error", error });
   }
 });
+
+
 
 
 

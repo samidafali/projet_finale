@@ -8,23 +8,34 @@ const {
   approveCourse,
   addTeacherToCourse,
   addUserToCourse,
-  getEnrolledCourses
+  getEnrolledCourses,
 } = require("../controllers/courseController.js");
 const adminAuth = require("../middleware/adminMiddleware");
+const multer = require("multer");
+
+const upload = multer({ dest: "uploads/" }); // Temporary storage in 'uploads/' before processing
 
 const router = express.Router();
 
-// Routes publiques
+// Public Routes
 router.get("/", getAllCourses);
 router.get("/admin/all", adminAuth, getAllCourses);
 router.get("/:id", getCourseById);
 
-// Routes protégées par les rôles (admins and teachers)
-router.post("/", adminAuth, createCourse);
+// Protected routes for admins and teachers
+router.post(
+  "/",
+  adminAuth,
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "videos", maxCount: 5 },
+  ]),
+  createCourse
+);
 router.put("/:id", adminAuth, updateCourse);
 router.delete("/:id", adminAuth, deleteCourse);
 router.put("/:id/addTeacher", adminAuth, addTeacherToCourse);
-router.put("/:courseId/enroll", addUserToCourse);  // Add the route
+router.put("/:courseId/enroll", addUserToCourse); // Enroll user route
 router.patch("/:id/approve", adminAuth, approveCourse);
 
 module.exports = router;
