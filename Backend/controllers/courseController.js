@@ -66,7 +66,7 @@ const createCourse = asyncHandler(async (req, res) => {
       throw new ApiError(403, "User not found or role is not defined");
     }
 
-    const { coursename, description, schedule, videoTitles } = req.body;
+    const { coursename, description, schedule, videoTitles, difficulty, isFree, price } = req.body;
     let { enrolledteacher } = req.body;
 
     // Initialize variables for uploaded files
@@ -99,6 +99,9 @@ const createCourse = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Enrolled teacher is required.");
     }
 
+    // Determine the price, if the course is paid
+    const coursePrice = isFree === "false" ? price : 0;
+
     const newCourse = await Course.create({
       coursename,
       description,
@@ -106,6 +109,9 @@ const createCourse = asyncHandler(async (req, res) => {
       enrolledteacher,
       imageUrl,
       videos,
+      difficulty,
+      isFree: isFree === "true",
+      price: coursePrice,
       isapproved: true
     });
 
@@ -120,11 +126,13 @@ const createCourse = asyncHandler(async (req, res) => {
 
 
 
+
+// Mettre à jour les informations d'un cours (Admin ou Teacher qui a créé le cours)
 // Mettre à jour les informations d'un cours (Admin ou Teacher qui a créé le cours)
 // Mettre à jour les informations d'un cours (Admin ou Teacher qui a créé le cours)
 const updateCourse = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { coursename, description, schedule, enrolledteacher, isapproved } = req.body;
+  const { coursename, description, schedule, enrolledteacher, isapproved, difficulty, isFree, price } = req.body;
   const user = req.admin || req.teacher; // Admin or teacher from middleware
 
   if (!user) {
@@ -147,16 +155,50 @@ const updateCourse = asyncHandler(async (req, res) => {
   const updateFields = {
     coursename,
     description,
-    schedule,
     isapproved,
+    difficulty,
+    isFree: isFree === "true", // Update the isFree flag
+    price: isFree === "false" ? price : 0, // Set the price to 0 if the course is free
   };
+
+  // Ensure schedule is correctly formatted
+  if (schedule) {
+    try {
+      updateFields.schedule = JSON.parse(schedule); // Ensure it's a valid JSON string
+    } catch (err) {
+      throw new ApiError(400, "Invalid schedule format");
+    }
+  }
 
   // Vérification de l'ID de l'enseignant
   if (enrolledteacher) {
     if (!mongoose.Types.ObjectId.isValid(enrolledteacher)) {
       throw new ApiError(400, "Invalid teacher ID format");
     }
-    updateFields.enrolledteacher = new mongoose.Types.ObjectId(enrolledteacher); // Assurez-vous que c'est un ObjectId valide
+    updateFields.enrolledteacher = new mongoose.Types.ObjectId(enrolledteacher);
+  }
+
+  // Update image if provided
+  if (req.files && req.files.image) {
+    const imageResult = await cloudinary.uploader.upload(req.files.image[0].path, {
+      folder: "courses",
+      resource_type: "image",
+    });
+    updateFields.imageUrl = imageResult.secure_url;
+  }
+
+  // Update videos if provided
+  if (req.files && req.files.videos) {
+    let videos = [];
+    for (let i = 0; i < req.files.videos.length; i++) {
+      const video = req.files.videos[i];
+      const videoResult = await cloudinary.uploader.upload(video.path, {
+        folder: "courses/videos",
+        resource_type: "video",
+      });
+      videos.push({ url: videoResult.secure_url, title: req.body.videoTitles[i] });
+    }
+    updateFields.videos = videos;
   }
 
   const updatedCourse = await Course.findByIdAndUpdate(
@@ -167,6 +209,11 @@ const updateCourse = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, updatedCourse, "Course updated successfully"));
 });
+
+  
+  
+
+
 
 
 

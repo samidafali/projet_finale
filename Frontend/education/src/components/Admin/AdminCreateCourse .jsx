@@ -9,7 +9,10 @@ const AdminCreateCourse = () => {
     coursename: "",
     description: "",
     schedule: [], // Schedule array
-    enrolledteacher: "" // Store selected teacher's ID here
+    enrolledteacher: "", // Store selected teacher's ID here
+    difficulty: "facile", // Default difficulty level
+    isFree: "true", // Default value for course free status
+    price: 0 // Default price (only relevant if the course is paid)
   });
 
   const [newSchedule, setNewSchedule] = useState({ day: "", starttime: "", endtime: "" }); // New schedule entry
@@ -17,7 +20,7 @@ const AdminCreateCourse = () => {
   const [image, setImage] = useState(null); // State to store selected image
   const [videos, setVideos] = useState([{ title: "", file: null }]); // State to store selected videos with titles
 
-  // Handle input changes for course name, description, etc.
+  // Handle input changes for course data
   const handleChange = (e) => {
     setCourseData({
       ...courseData,
@@ -70,6 +73,13 @@ const AdminCreateCourse = () => {
     formData.append("description", courseData.description);
     formData.append("enrolledteacher", courseData.enrolledteacher);
     formData.append("schedule", JSON.stringify(courseData.schedule));
+    formData.append("difficulty", courseData.difficulty);
+    formData.append("isFree", courseData.isFree);
+    
+    // If the course is not free, include the price
+    if (courseData.isFree === "false") {
+      formData.append("price", courseData.price);
+    }
 
     // Append image if selected
     if (image) {
@@ -110,6 +120,7 @@ const AdminCreateCourse = () => {
         {successMessage && <p className={styles.success_message}>{successMessage}</p>}
 
         <form onSubmit={handleSubmit}>
+          {/* Course name */}
           <input
             type="text"
             name="coursename"
@@ -118,6 +129,8 @@ const AdminCreateCourse = () => {
             onChange={handleChange}
             required
           />
+
+          {/* Course description */}
           <textarea
             name="description"
             placeholder="Course Description"
@@ -131,6 +144,39 @@ const AdminCreateCourse = () => {
             selectedTeacher={courseData.enrolledteacher}
             onSelect={handleTeacherSelect}
           />
+
+          {/* Difficulty level */}
+          <div>
+            <label>Course Difficulty</label>
+            <select name="difficulty" value={courseData.difficulty} onChange={handleChange}>
+              <option value="facile">Facile</option>
+              <option value="moyen">Moyen</option>
+              <option value="difficile">Difficile</option>
+            </select>
+          </div>
+
+          {/* Course Type: Free or Paid */}
+          <div>
+            <label>Is the Course Free?</label>
+            <select name="isFree" value={courseData.isFree} onChange={handleChange}>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+
+          {/* Course Price (only if not free) */}
+          {courseData.isFree === "false" && (
+            <div>
+              <label>Course Price</label>
+              <input
+                type="number"
+                name="price"
+                value={courseData.price}
+                onChange={handleChange}
+                placeholder="Enter course price"
+              />
+            </div>
+          )}
 
           {/* Schedule input */}
           <div className={styles.schedule_container}>

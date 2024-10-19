@@ -19,9 +19,13 @@ const courseSchema = new mongoose.Schema({
       url: { type: String },
       title: { type: String }
     }
-  ]
+  ],
+  difficulty: { type: String, enum: ["facile", "moyen", "difficile"], required: true }, // Difficulty level
+  isFree: { type: Boolean, default: true }, // Whether the course is free or paid
+  price: { type: Number, default: 0 }, // Price of the course if it's not free
 });
 
 const Course = mongoose.model("Course", courseSchema);
 
 module.exports = { Course };
+

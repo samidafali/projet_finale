@@ -74,6 +74,17 @@ const AdminCourses = () => {
             <li key={course._id} className={styles.course_item}>
               <h3>{course.coursename}</h3>
               <p>{course.description}</p>
+
+              {/* Display difficulty level */}
+              <p>Difficulty Level: {course.difficulty}</p>
+
+              {/* Display if the course is free or has a price */}
+              {course.isFree ? (
+                <p>Course Price: Free</p>
+              ) : (
+                <p>Course Price: ${course.price}</p>
+              )}
+
               <p>
                 Schedule:{" "}
                 {course.schedule
