@@ -36,6 +36,7 @@ const teacherRegister = async (req, res) => {
 };
 
 // Teacher login
+// Teacher login
 const teacherLogin = async (req, res) => {
     const { email, password } = req.body;
 
@@ -48,11 +49,11 @@ const teacherLogin = async (req, res) => {
         return res.status(400).json({ message: "Please verify your email before logging in." });
     }
 
-    const accessToken = teacher.generateAuthToken();
-    const refreshToken = teacher.generateRefreshToken();
-
-    res.status(200).json({ accessToken, refreshToken });
+    const accessToken = teacher.generateAuthToken(); // Generate JWT token
+    res.status(200).json({ accessToken }); // Consistently return accessToken
 };
+
+
 
 // Email verification
 const verifyTeacherEmail = async (req, res) => {

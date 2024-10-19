@@ -32,7 +32,16 @@ router.post(
   ]),
   createCourse
 );
-router.put("/:id", adminAuth, updateCourse);
+router.put(
+  "/:id",
+  adminAuth,
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "videos", maxCount: 5 },
+  ]),
+  updateCourse
+);
+
 router.delete("/:id", adminAuth, deleteCourse);
 router.put("/:id/addTeacher", adminAuth, addTeacherToCourse);
 router.put("/:courseId/enroll", addUserToCourse); // Enroll user route

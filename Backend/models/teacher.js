@@ -27,10 +27,11 @@ teacherSchema.methods.isPasswordCorrect = async function (enteredPassword) {
 
 // Generate JWT token for authentication
 teacherSchema.methods.generateAuthToken = function () {
-    return jwt.sign({ _id: this._id }, process.env.JWTPRIVATEKEY, {
-        expiresIn: "1h",
+    return jwt.sign({ _id: this._id, role: this.role }, process.env.JWTPRIVATEKEY, {
+        expiresIn: "7d",
     });
 };
+
 
 // Generate refresh token
 teacherSchema.methods.generateRefreshToken = function () {

@@ -1,37 +1,32 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Main from "../Main/Main"; // Assuming Main is your navbar component
-//import EnrollStudent from "./EnrollStudent";
 import styles from "./styles.module.css";
-//import TeacherCreateCourse from "./TeacherCreateCourse";
-import UpdateCourse from "./UpdateCourse"; // Importer le nouveau composant
 
 const TeacherDashboard = () => {
-  const [courses, setCourses] = useState([]); // État pour stocker les cours
-  const [error, setError] = useState(null); // État pour stocker les erreurs
-  const [selectedCourseId, setSelectedCourseId] = useState(null); // État pour l'ID du cours sélectionné
+  const [courses, setCourses] = useState([]); // State to store courses
+  const [error, setError] = useState(null); // State to store errors
+  const [successMessage, setSuccessMessage] = useState(""); // State for success messages
 
+  // Fetch courses on component mount
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const token = localStorage.getItem("token"); // Récupérer le token depuis le stockage local
+        const token = localStorage.getItem("token"); // Retrieve token from localStorage
         const response = await axios.get("http://localhost:8050/api/courses", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setCourses(response.data.data); // Supposons que les cours sont dans response.data.data
+        setCourses(response.data.data); // Assuming courses are in response.data.data
       } catch (error) {
         setError("Failed to fetch courses");
         console.error(error);
       }
     };
 
-    fetchCourses(); // Récupérer les cours au montage du composant
+    fetchCourses(); // Call the fetch function on component mount
   }, []);
 
-  const handleEditCourse = (courseId) => {
-    setSelectedCourseId(courseId); // Mettre à jour l'ID du cours sélectionné
-  };
-
+  // Handle course deletion
   const handleDeleteCourse = (courseId) => {
     const token = localStorage.getItem("token");
     axios
@@ -39,30 +34,32 @@ const TeacherDashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        setCourses(courses.filter((course) => course._id !== courseId)); // Mettre à jour l'UI après la suppression
-        console.log("Course deleted successfully");
+        setCourses(courses.filter((course) => course._id !== courseId)); // Update UI after deletion
+        setSuccessMessage("Course deleted successfully");
       })
       .catch((error) => {
         console.error("Error deleting course:", error);
+        setError("Failed to delete course");
       });
   };
 
   return (
     <div className={styles.dashboard_container}>
-      <Main /> {/* Inclure la barre de navigation */}
+      <Main /> {/* Include navbar component */}
       <div className={styles.dashboard_content}>
         <h1>Teacher Dashboard</h1>
         <p>Manage your courses here.</p>
 
-        {/* Affichage des erreurs */}
+        {/* Success and error messages */}
+        {successMessage && <p className={styles.success_message}>{successMessage}</p>}
         {error && <p className={styles.error}>{error}</p>}
 
-        {/* Liste des cours */}
+        {/* Course list */}
         <h2>Your Courses</h2>
         {courses.length > 0 ? (
-          <ul>
+          <ul className={styles.course_list}>
             {courses.map((course) => (
-              <li key={course._id}>
+              <li key={course._id} className={styles.course_item}>
                 <h3>{course.coursename}</h3>
                 <p>{course.description}</p>
                 <p>
@@ -71,23 +68,52 @@ const TeacherDashboard = () => {
                     .map((s) => `${s.day}: ${s.starttime} - ${s.endtime}`)
                     .join(", ")}
                 </p>
+                <p>Difficulty: {course.difficulty}</p>
+                <p>Price: {course.isFree === "true" ? "Free" : `$${course.price}`}</p>
 
-                {/* Boutons de modification et de suppression */}
-                <button onClick={() => handleEditCourse(course._id)}>Edit Course</button>
-                <button onClick={() => handleDeleteCourse(course._id)}>Delete Course</button>
+                {/* Image display */}
+                {course.imageUrl && (
+                  <div className={styles.course_image_container}>
+                    <img
+                      src={course.imageUrl}
+                      alt="Course"
+                      className={styles.course_image}
+                    />
+                  </div>
+                )}
 
-                {/* Formulaire pour inscrire des étudiants */}
-                
+                {/* Video display */}
+                {course.videos && course.videos.length > 0 && (
+                  <div>
+                    <h4>Course Videos</h4>
+                    {course.videos.map((video, index) => (
+                      <div key={index} className={styles.video_container}>
+                        <p>{video.title}</p>
+                        <video
+                          controls
+                          width="300"
+                          src={video.url}
+                          className={styles.video_player}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Delete button */}
+                <div className={styles.course_buttons}>
+                  <button
+                    className={styles.delete_button}
+                    onClick={() => handleDeleteCourse(course._id)}
+                  >
+                    Delete Course
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
         ) : (
           <p>No courses available</p>
-        )}
-
-        {/* Affichage du formulaire de mise à jour si un cours est sélectionné */}
-        {selectedCourseId && (
-          <UpdateCourse courseId={selectedCourseId} onClose={() => setSelectedCourseId(null)} />
         )}
       </div>
     </div>

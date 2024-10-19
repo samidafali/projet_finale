@@ -22,19 +22,23 @@ const checkRole = (user, role) => {
 // Récupérer tous les cours approuvés
 // Récupérer tous les cours
 const getAllCourses = asyncHandler(async (req, res) => {
-  const user = req.admin || req.teacher || req.user; // Récupérer l'utilisateur connecté
+  const user = req.admin || req.teacher || req.user; // Get the logged-in user
 
   let courses;
 
-  // Si l'utilisateur est un administrateur, renvoyer tous les cours
+  // If the user is an admin, return all courses
   if (user && checkRole(user, 'admin')) {
-    courses = await Course.find().populate('enrolledteacher', 'firstName lastName email');
+    courses = await Course.find()
+      .populate('enrolledteacher', 'firstName lastName email')
+      .select('coursename description schedule enrolledteacher isapproved imageUrl videos difficulty isFree price');
     return res
       .status(200)
       .json(new ApiResponse(200, courses, "All courses fetched successfully"));
   } else {
-    // Sinon, renvoyer uniquement les cours approuvés
-    courses = await Course.find({ isapproved: true }).populate('enrolledteacher', 'firstName lastName email');
+    // Otherwise, return only the approved courses
+    courses = await Course.find({ isapproved: true })
+      .populate('enrolledteacher', 'firstName lastName email')
+      .select('coursename description schedule enrolledteacher isapproved imageUrl videos difficulty isFree price');
     return res
       .status(200)
       .json(new ApiResponse(200, courses, "Approved courses fetched successfully"));
@@ -42,11 +46,16 @@ const getAllCourses = asyncHandler(async (req, res) => {
 });
 
 
+
+
 // Récupérer les détails d'un cours spécifique par ID
 const getCourseById = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const singleCourse = await Course.findById(id);
+  const singleCourse = await Course.findById(id)
+    .populate('enrolledteacher', 'firstName lastName email')
+    .select('coursename description schedule enrolledteacher isapproved imageUrl videos difficulty isFree price');
+
   if (!singleCourse) {
     throw new ApiError(404, "Course not found");
   }
@@ -56,18 +65,26 @@ const getCourseById = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, singleCourse, "Course details fetched successfully"));
 });
 
+
+
 // Créer un nouveau cours (Admin ou Teacher)
 // Créer un nouveau cours (Admin ou Teacher)
 // Créer un nouveau cours (Admin ou Teacher)
 const createCourse = asyncHandler(async (req, res) => {
   try {
-    const user = req.admin || req.teacher;
+    const user = req.admin || req.teacher; // Récupérer l'utilisateur (admin ou teacher)
     if (!user) {
       throw new ApiError(403, "User not found or role is not defined");
     }
 
     const { coursename, description, schedule, videoTitles, difficulty, isFree, price } = req.body;
-    let { enrolledteacher } = req.body;
+
+    // Si l'utilisateur est un enseignant, utiliser son ID comme `enrolledteacher`
+    const enrolledteacher = checkRole(user, 'teacher') ? user._id : req.body.enrolledteacher;
+
+    if (checkRole(user, 'teacher') && !enrolledteacher) {
+      throw new ApiError(400, "Enrolled teacher is required.");
+    }
 
     // Initialize variables for uploaded files
     let imageUrl = null;
@@ -94,14 +111,10 @@ const createCourse = asyncHandler(async (req, res) => {
       }
     }
 
-    // Check role and create the course accordingly
-    if (!enrolledteacher) {
-      throw new ApiError(400, "Enrolled teacher is required.");
-    }
-
     // Determine the price, if the course is paid
     const coursePrice = isFree === "false" ? price : 0;
 
+    // Créer un nouveau cours avec les informations fournies
     const newCourse = await Course.create({
       coursename,
       description,
@@ -112,7 +125,7 @@ const createCourse = asyncHandler(async (req, res) => {
       difficulty,
       isFree: isFree === "true",
       price: coursePrice,
-      isapproved: true
+      isapproved: true // Le cours peut être approuvé par défaut ou en attente de validation selon votre logique
     });
 
     return res.status(201).json(new ApiResponse(201, newCourse, "New course created successfully."));
@@ -127,13 +140,19 @@ const createCourse = asyncHandler(async (req, res) => {
 
 
 
+
 // Mettre à jour les informations d'un cours (Admin ou Teacher qui a créé le cours)
 // Mettre à jour les informations d'un cours (Admin ou Teacher qui a créé le cours)
 // Mettre à jour les informations d'un cours (Admin ou Teacher qui a créé le cours)
+
+// Update a course (Admin or Teacher)
+// Update a course (Admin or Teacher who is assigned or created the course)
+
+
 const updateCourse = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { coursename, description, schedule, enrolledteacher, isapproved, difficulty, isFree, price } = req.body;
-  const user = req.admin || req.teacher; // Admin or teacher from middleware
+  const { coursename, description, schedule, difficulty, isFree, price } = req.body;
+  const user = req.admin || req.teacher;
 
   if (!user) {
     throw new ApiError(403, "User not found or role is not defined");
@@ -144,71 +163,72 @@ const updateCourse = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Course not found or could not be updated");
   }
 
-  if (checkRole(user, 'admin')) {
-    console.log("User is an admin, authorized to update");
-  } else if (checkRole(user, 'teacher') && existingCourse.enrolledteacher.toString() === user._id.toString()) {
-    console.log("Teacher is authorized to update their own course");
+  if (checkRole(user, 'admin') || (checkRole(user, 'teacher') && existingCourse.enrolledteacher.toString() === user._id.toString())) {
+    const updateFields = {
+      coursename,
+      description,
+      difficulty,
+      isFree: isFree === "true",
+      price: isFree === "false" ? price : 0,
+    };
+
+    // Mise à jour du planning (schedule) si fourni
+    if (schedule) {
+      try {
+        updateFields.schedule = JSON.parse(schedule);
+      } catch (err) {
+        throw new ApiError(400, "Invalid schedule format");
+      }
+    }
+
+    // Gestion des fichiers image et vidéo
+    let imageUrl = existingCourse.imageUrl; // Garder l'ancienne image si aucune nouvelle n'est téléchargée
+    let videos = existingCourse.videos || []; // Garder les anciennes vidéos si aucune nouvelle n'est téléchargée
+
+    if (req.files) {
+      // Gestion de l'image
+      if (req.files.image) {
+        const imageResult = await cloudinary.uploader.upload(req.files.image[0].path, {
+          folder: "courses",
+          resource_type: "image",
+        });
+        imageUrl = imageResult.secure_url; // Mettre à jour avec la nouvelle image
+      }
+
+      // Gestion des vidéos
+      if (req.files.videos) {
+        videos = [];
+        for (let i = 0; i < req.files.videos.length; i++) {
+          const video = req.files.videos[i];
+          const videoResult = await cloudinary.uploader.upload(video.path, {
+            folder: "courses/videos",
+            resource_type: "video",
+          });
+          videos.push({ url: videoResult.secure_url, title: req.body.videoTitles[i] || "Untitled Video" });
+        }
+      }
+    }
+
+    // Ajouter imageUrl et vidéos à updateFields
+    updateFields.imageUrl = imageUrl;
+    updateFields.videos = videos;
+
+    // Mise à jour du cours dans la base de données
+    const updatedCourse = await Course.findByIdAndUpdate(id, { $set: updateFields }, { new: true });
+    return res.status(200).json(new ApiResponse(200, updatedCourse, "Course updated successfully"));
   } else {
     throw new ApiError(403, "Access denied, you are not authorized to update this course");
   }
-
-  const updateFields = {
-    coursename,
-    description,
-    isapproved,
-    difficulty,
-    isFree: isFree === "true", // Update the isFree flag
-    price: isFree === "false" ? price : 0, // Set the price to 0 if the course is free
-  };
-
-  // Ensure schedule is correctly formatted
-  if (schedule) {
-    try {
-      updateFields.schedule = JSON.parse(schedule); // Ensure it's a valid JSON string
-    } catch (err) {
-      throw new ApiError(400, "Invalid schedule format");
-    }
-  }
-
-  // Vérification de l'ID de l'enseignant
-  if (enrolledteacher) {
-    if (!mongoose.Types.ObjectId.isValid(enrolledteacher)) {
-      throw new ApiError(400, "Invalid teacher ID format");
-    }
-    updateFields.enrolledteacher = new mongoose.Types.ObjectId(enrolledteacher);
-  }
-
-  // Update image if provided
-  if (req.files && req.files.image) {
-    const imageResult = await cloudinary.uploader.upload(req.files.image[0].path, {
-      folder: "courses",
-      resource_type: "image",
-    });
-    updateFields.imageUrl = imageResult.secure_url;
-  }
-
-  // Update videos if provided
-  if (req.files && req.files.videos) {
-    let videos = [];
-    for (let i = 0; i < req.files.videos.length; i++) {
-      const video = req.files.videos[i];
-      const videoResult = await cloudinary.uploader.upload(video.path, {
-        folder: "courses/videos",
-        resource_type: "video",
-      });
-      videos.push({ url: videoResult.secure_url, title: req.body.videoTitles[i] });
-    }
-    updateFields.videos = videos;
-  }
-
-  const updatedCourse = await Course.findByIdAndUpdate(
-    id,
-    { $set: updateFields },
-    { new: true }
-  );
-
-  return res.status(200).json(new ApiResponse(200, updatedCourse, "Course updated successfully"));
 });
+
+
+
+
+
+
+
+
+
 
   
   

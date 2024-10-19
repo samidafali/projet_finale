@@ -8,13 +8,18 @@ const TeacherCreateCourse = () => {
     coursename: "",
     description: "",
     schedule: [], // Schedule array
+    difficulty: "easy", // Default difficulty
+    isFree: "true", // Default to free course
+    price: "", // Price for paid courses
   });
 
   const [newSchedule, setNewSchedule] = useState({ day: "", starttime: "", endtime: "" }); // New schedule entry
+  const [image, setImage] = useState(null); // State to handle image upload
+  const [videos, setVideos] = useState([{ title: "", file: null }]); // Dynamic video fields
   const [successMessage, setSuccessMessage] = useState(""); // State for success message
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
 
-  // Handle input changes for course name, description, etc.
+  // Handle input changes for course name, description, difficulty, etc.
   const handleChange = (e) => {
     setCourseData({
       ...courseData,
@@ -33,11 +38,52 @@ const TeacherCreateCourse = () => {
     }
   };
 
+  // Handle image file upload
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+  // Handle video fields changes
+  const handleVideoChange = (index, field, value) => {
+    const updatedVideos = [...videos];
+    updatedVideos[index][field] = value;
+    setVideos(updatedVideos);
+  };
+
+  // Add more video fields
+  const addVideoInputs = () => {
+    setVideos([...videos, { title: "", file: null }]);
+  };
+
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("coursename", courseData.coursename);
+    formData.append("description", courseData.description);
+    formData.append("schedule", JSON.stringify(courseData.schedule));
+    formData.append("difficulty", courseData.difficulty);
+    formData.append("isFree", courseData.isFree);
+    if (courseData.isFree === "false") {
+      formData.append("price", courseData.price);
+    }
+
+    // Append image if selected
+    if (image) {
+      formData.append("image", image);
+    }
+
+    // Append videos and titles
+    videos.forEach((video, index) => {
+      if (video.file) {
+        formData.append(`videos`, video.file);
+        formData.append(`videoTitles[]`, video.title); // Append the corresponding title
+      }
+    });
+
     axios
-      .post("http://localhost:8050/api/courses", courseData, {
+      .post("http://localhost:8050/api/courses", formData, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // Add the Authorization header
       })
       .then((response) => {
@@ -49,7 +95,12 @@ const TeacherCreateCourse = () => {
           coursename: "",
           description: "",
           schedule: [],
+          difficulty: "easy",
+          isFree: "true",
+          price: "",
         });
+        setImage(null);
+        setVideos([{ title: "", file: null }]);
       })
       .catch((error) => {
         console.error("Error creating course:", error);
@@ -73,7 +124,7 @@ const TeacherCreateCourse = () => {
         {successMessage && <p className={styles.success_message}>{successMessage}</p>}
         {errorMessage && <p className={styles.error_message}>{errorMessage}</p>}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} encType="multipart/form-data">
           <input
             type="text"
             name="coursename"
@@ -129,6 +180,80 @@ const TeacherCreateCourse = () => {
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* Difficulty level */}
+          <label htmlFor="difficulty">Difficulty</label>
+          <select
+            name="difficulty"
+            value={courseData.difficulty}
+            onChange={handleChange}
+            className={styles.select}
+          >
+            <option value="facile">Easy</option>
+            <option value="moyen">Medium</option>
+            <option value="difficile">Hard</option>
+          </select>
+
+          {/* Free or paid course */}
+          <label htmlFor="isFree">Is this course free?</label>
+          <select
+            name="isFree"
+            value={courseData.isFree}
+            onChange={handleChange}
+            className={styles.select}
+          >
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+
+          {/* Price for paid courses */}
+          {courseData.isFree === "false" && (
+            <input
+              type="number"
+              name="price"
+              placeholder="Course Price"
+              value={courseData.price}
+              onChange={handleChange}
+              className={styles.input}
+              required
+            />
+          )}
+
+          {/* Image upload */}
+          <label htmlFor="image">Course Image</label>
+          <input
+            type="file"
+            name="image"
+            accept="image/*"
+            onChange={handleImageChange}
+            className={styles.file_input}
+          />
+
+          {/* Video inputs */}
+          <div className={styles.video_inputs_container}>
+            <h3>Course Videos</h3>
+            {videos.map((video, index) => (
+              <div key={index} className={styles.video_input_item}>
+                <input
+                  type="text"
+                  placeholder={`Video Title ${index + 1}`}
+                  value={video.title}
+                  onChange={(e) => handleVideoChange(index, "title", e.target.value)}
+                />
+                <input
+                  type="file"
+                  name="videos[]"
+                  accept="video/*"
+                  onChange={(e) => handleVideoChange(index, "file", e.target.files[0])}
+                />
+              </div>
+            ))}
+            {videos.length < 5 && (
+              <button type="button" onClick={addVideoInputs} className={styles.add_video_btn}>
+                Add Another Video
+              </button>
+            )}
           </div>
 
           <button type="submit" className={styles.submit_btn}>
