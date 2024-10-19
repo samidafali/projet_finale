@@ -27,5 +27,4 @@ const studentAuth = async (req, res, next) => {
     }
 };
 
-
 module.exports = studentAuth;

@@ -24,52 +24,63 @@ const Login = () => {
 	// Handle form submission
 // Handle form submission
 const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-        // Select the correct URL based on role
-        const url =
-            role === "admin"
-                ? "http://localhost:8050/api/admin/login"
-                : role === "teacher"
-                ? "http://localhost:8050/api/teachers/login"
-                : "http://localhost:8050/api/auth/login"; // User login endpoint
+	e.preventDefault();
+	try {
+		// Select the correct URL based on role
+		const url =
+			role === "admin"
+				? "http://localhost:8050/api/admin/login"
+				: role === "teacher"
+				? "http://localhost:8050/api/teachers/login"
+				: "http://localhost:8050/api/auth/login"; // User login endpoint
 
-        const response = await axios.post(url, data);
-        const resData = response.data;
+		const response = await axios.post(url, data);
+		const resData = response.data;
 
-        // Store the token and role in localStorage
-        localStorage.setItem("token", resData.accessToken); // Store accessToken
-        localStorage.setItem("role", role); // Store role
+		// Log the response to check where the token is stored
+		console.log(resData);
 
-        // Store the ID based on role
-        if (role === "admin") {
-            localStorage.setItem("adminId", resData.adminId);
-        } else if (role === "teacher") {
-            localStorage.setItem("teacherId", resData.teacherId);
-        } else if (role === "user") {
-            localStorage.setItem("studentId", resData.studentId);
-        }
+		// Determine the correct token field based on response
+		const token = resData.accessToken || resData.data || resData.token;
 
-        setSuccess("Login successful!");
+		// Store the token and role in localStorage
+		if (token) {
+			localStorage.setItem("token", token); // Store token (check if it's accessToken, token, or data)
+		} else {
+			throw new Error("Token not found in response");
+		}
 
-        // Redirect based on role
-        if (role === "admin") {
-            window.location = "/admindashboard";
-        } else if (role === "teacher") {
-            window.location = "/teacher-dashboard";
-        } else {
-            window.location = "/studentdashboard"; // Redirect for user role
-        }
-    } catch (error) {
-        if (
-            error.response &&
-            error.response.status >= 400 &&
-            error.response.status <= 500
-        ) {
-            setError(error.response.data.message);
-            setSuccess("");
-        }
-    }
+		localStorage.setItem("role", role); // Store role
+
+		// Store the ID based on role
+		if (role === "admin") {
+			localStorage.setItem("adminId", resData.adminId);
+		} else if (role === "teacher") {
+			localStorage.setItem("teacherId", resData.teacherId);
+		} else if (role === "user") {
+			localStorage.setItem("studentId", resData.studentId);
+		}
+
+		setSuccess("Login successful!");
+
+		// Redirect based on role
+		if (role === "admin") {
+			window.location = "/admindashboard";
+		} else if (role === "teacher") {
+			window.location = "/teacher-dashboard";
+		} else {
+			window.location = "/studentdashboard"; // Redirect for user role
+		}
+	} catch (error) {
+		if (
+			error.response &&
+			error.response.status >= 400 &&
+			error.response.status <= 500
+		) {
+			setError(error.response.data.message);
+			setSuccess("");
+		}
+	}
 };
 
 

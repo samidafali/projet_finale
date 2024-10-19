@@ -14,8 +14,8 @@ const StudentDashboard = () => {
     // Fetch student details when the component mounts
     useEffect(() => {
         const fetchStudentDetails = async () => {
-            if (!studentId) {
-                setError("Student ID is missing. Please log in again.");
+            if (!studentId || !token) {
+                setError("Student ID or token is missing. Please log in again.");
                 return;
             }
 
@@ -29,6 +29,7 @@ const StudentDashboard = () => {
                 });
                 console.log("Student data fetched:", response.data);
                 setStudent(response.data.data); // Set student data
+                setError(""); // Clear error
             } catch (error) {
                 console.error("Error fetching student details:", error);
                 setError(error.response ? error.response.data.message : "An error occurred while fetching student details.");

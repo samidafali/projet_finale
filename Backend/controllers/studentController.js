@@ -52,7 +52,8 @@ const deleteStudent = asyncHandler(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, null, "Student deleted successfully"));
 });
-// In studentController.js
+
+// Fetch a specific student by ID
 const getStudentById = asyncHandler(async (req, res) => {
     const { id } = req.params; // Student ID from URL parameters
     const student = await User.findById(id);
@@ -63,7 +64,6 @@ const getStudentById = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, student, "Student retrieved successfully"));
 });
 
-// Export functions
 module.exports = {
     getAllStudents,
     updateStudent,
