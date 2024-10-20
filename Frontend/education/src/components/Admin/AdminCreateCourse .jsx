@@ -10,7 +10,7 @@ const AdminCreateCourse = () => {
     description: "",
     schedule: [], // Schedule array
     enrolledteacher: "", // Store selected teacher's ID here
-    difficulty: "facile", // Default difficulty level
+    difficulty: "easy", // Default difficulty level
     isFree: "true", // Default value for course free status
     price: 0 // Default price (only relevant if the course is paid)
   });

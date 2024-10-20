@@ -28,15 +28,15 @@ const getAllCourses = asyncHandler(async (req, res) => {
   let courses;
 
   console.log("Fetching all courses...");
-  
+
   if (user && checkRole(user, 'admin')) {
     courses = await Course.find()
       .populate('enrolledteacher', 'firstName lastName email')
-      .select('coursename description schedule enrolledteacher imageUrl videos difficulty price enrolledUsers');
+      .select('coursename description schedule enrolledteacher imageUrl videos difficulty price isFree enrolledUsers');
   } else {
     courses = await Course.find({ isapproved: true })
       .populate('enrolledteacher', 'firstName lastName email')
-      .select('coursename description schedule enrolledteacher imageUrl videos difficulty price enrolledUsers');
+      .select('coursename description schedule enrolledteacher imageUrl videos difficulty price isFree enrolledUsers');
   }
 
   return res.status(200).json(new ApiResponse(200, courses, "Courses fetched successfully"));
@@ -119,21 +119,11 @@ const getCourseVideos = asyncHandler(async (req, res) => {
 // Créer un nouveau cours (Admin ou Teacher)
 const createCourse = asyncHandler(async (req, res) => {
   try {
-    const user = req.admin || req.teacher; // Récupérer l'utilisateur (admin ou teacher)
-    if (!user) {
-      throw new ApiError(403, "User not found or role is not defined");
-    }
-
     const { coursename, description, schedule, videoTitles, difficulty, isFree, price } = req.body;
 
-    // Si l'utilisateur est un enseignant, utiliser son ID comme `enrolledteacher`
-    const enrolledteacher = checkRole(user, 'teacher') ? user._id : req.body.enrolledteacher;
+    const isFreeBool = isFree === 'true' || isFree === true;
+    const coursePrice = isFreeBool ? 0 : price;
 
-    if (checkRole(user, 'teacher') && !enrolledteacher) {
-      throw new ApiError(400, "Enrolled teacher is required.");
-    }
-
-    // Initialize variables for uploaded files
     let imageUrl = null;
     let videos = [];
 
@@ -146,7 +136,7 @@ const createCourse = asyncHandler(async (req, res) => {
       imageUrl = imageResult.secure_url;
     }
 
-    // Handle video uploads with titles
+    // Handle video uploads
     if (req.files && req.files.videos) {
       for (let i = 0; i < req.files.videos.length; i++) {
         const video = req.files.videos[i];
@@ -158,21 +148,17 @@ const createCourse = asyncHandler(async (req, res) => {
       }
     }
 
-    // Determine the price, if the course is paid
-    const coursePrice = isFree === "false" ? price : 0;
-
-    // Créer un nouveau cours avec les informations fournies
+    // Create a new course
     const newCourse = await Course.create({
       coursename,
       description,
       schedule: JSON.parse(schedule),
-      enrolledteacher,
       imageUrl,
       videos,
       difficulty,
-      isFree: isFree === "true",
+      isFree: isFreeBool,
       price: coursePrice,
-      isapproved: true // Le cours peut être approuvé par défaut ou en attente de validation selon votre logique
+      isapproved: true
     });
 
     return res.status(201).json(new ApiResponse(201, newCourse, "New course created successfully."));
@@ -181,6 +167,7 @@ const createCourse = asyncHandler(async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error", error });
   }
 });
+
 
 
 
@@ -432,14 +419,15 @@ const addUserToCourse = asyncHandler(async (req, res) => {
 
 // Récupérer les cours auxquels un utilisateur est inscrit
 const getEnrolledCourses = asyncHandler(async (req, res) => {
-  const { studentId } = req.params; // Extract student ID from the URL
+  const { studentId } = req.params;
 
-  const user = await User.findById(studentId); // Use studentId to find the user
+  const user = await User.findById(studentId);
   if (!user) {
     throw new ApiError(404, "User not found");
   }
 
-  const enrolledCourses = await Course.find({ enrolledUsers: studentId }).select("-enrolledUsers");
+  // Sélectionner les cours auxquels l'utilisateur est inscrit et inclure `imageUrl`
+  const enrolledCourses = await Course.find({ enrolledUsers: studentId }).select("coursename description imageUrl");
 
   if (!enrolledCourses || enrolledCourses.length === 0) {
     throw new ApiError(404, "No courses found for the specified user");
@@ -449,6 +437,7 @@ const getEnrolledCourses = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, enrolledCourses, "Enrolled courses fetched successfully"));
 });
+
 
 
 

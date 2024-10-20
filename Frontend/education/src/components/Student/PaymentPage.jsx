@@ -2,7 +2,6 @@ import { useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import axios from "axios";
 import { useParams, useNavigate } from 'react-router-dom';
-//import './PaymentPage.css'; // Import the CSS
 
 const PaymentPage = () => {
   const { courseId } = useParams(); // Get courseId from the URL
@@ -69,18 +68,91 @@ const PaymentPage = () => {
     }
   };
   
+  // Inline CSS for styling the form and elements
+  const styles = {
+    container: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      backgroundColor: '#f7f9fc',
+    },
+    formContainer: {
+      backgroundColor: '#ffffff',
+      padding: '30px',
+      maxWidth: '450px',
+      width: '100%',
+      borderRadius: '10px',
+      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+      border: '1px solid #e0e0e0',
+    },
+    title: {
+      color: '#333',
+      fontSize: '24px',
+      marginBottom: '20px',
+      textAlign: 'center',
+      fontWeight: '600',
+    },
+    stripeElement: {
+      backgroundColor: '#fafafa',
+      padding: '15px',
+      border: '1px solid #e0e0e0',
+      borderRadius: '5px',
+      marginBottom: '20px',
+      fontSize: '16px',
+    },
+    button: {
+      backgroundColor: '#4CAF50',
+      color: 'white',
+      padding: '12px',
+      border: 'none',
+      borderRadius: '5px',
+      width: '100%',
+      fontSize: '18px',
+      fontWeight: '600',
+      cursor: 'pointer',
+      transition: 'background-color 0.3s ease',
+    },
+    buttonDisabled: {
+      backgroundColor: '#cccccc',
+      cursor: 'not-allowed',
+    },
+    buttonHover: {
+      backgroundColor: '#45a049',
+    },
+    error: {
+      color: '#e74c3c',
+      fontSize: '14px',
+      marginTop: '-15px',
+      marginBottom: '20px',
+      textAlign: 'center',
+    },
+    success: {
+      color: '#4CAF50',
+      fontSize: '14px',
+      marginTop: '-15px',
+      marginBottom: '20px',
+      textAlign: 'center',
+    },
+  };
 
   return (
-    <div className="payment-page-container">
-      <h1>Complete your Payment</h1>
-      <form onSubmit={handleSubmit}>
-        <CardElement className="StripeElement" />
-        {errorMessage && <div className="error">{errorMessage}</div>}
-        {successMessage && <div className="success">{successMessage}</div>} {/* Display success message */}
-        <button type="submit" disabled={!stripe || isProcessing} className="bg-blue-500 text-white py-2 px-4 rounded">
-          {isProcessing ? 'Processing...' : 'Pay'}
-        </button>
-      </form>
+    <div style={styles.container}>
+      <div style={styles.formContainer}>
+        <h2 style={styles.title}>Complete your Payment</h2>
+        <form onSubmit={handleSubmit}>
+          <CardElement style={styles.stripeElement} />
+          {errorMessage && <div style={styles.error}>{errorMessage}</div>}
+          {successMessage && <div style={styles.success}>{successMessage}</div>}
+          <button 
+            type="submit" 
+            style={isProcessing ? { ...styles.button, ...styles.buttonDisabled } : styles.button}
+            disabled={!stripe || isProcessing}
+          >
+            {isProcessing ? 'Processing...' : 'Pay'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

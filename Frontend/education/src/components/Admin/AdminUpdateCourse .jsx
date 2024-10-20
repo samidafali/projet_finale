@@ -33,7 +33,7 @@ const AdminUpdateCourse = () => {
         setCourses(response.data.data);
       })
       .catch((error) => {
-        console.error("Error fetching courses:", error);
+       
         setErrorMessage("Error fetching courses");
       });
 
@@ -61,8 +61,8 @@ const AdminUpdateCourse = () => {
           setCourseData(response.data.data);
         })
         .catch((error) => {
-          console.error("Error fetching course details:", error);
-          setErrorMessage("Error fetching course details");
+          
+          setErrorMessage("");
         });
     }
   }, [selectedCourseId]);
@@ -158,7 +158,7 @@ const AdminUpdateCourse = () => {
         setErrorMessage("");
       })
       .catch((error) => {
-        console.error("Error updating course:", error);
+       
         setErrorMessage("Error updating course");
       });
   };

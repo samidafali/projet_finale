@@ -17,20 +17,30 @@ const StudentDashboard = () => {
   // Fetch courses function
   const fetchCourses = async () => {
     try {
+      // Envoyer la requête pour récupérer les cours depuis l'API
       const response = await axios.get('http://localhost:8050/api/courses', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Logging the courses response
+      // Vérifiez la réponse complète des cours récupérés
       console.log("Courses response:", response.data);
 
+      // Itérer sur chaque cours pour s'assurer que le champ 'isFree' est bien présent
+      response.data.data.forEach(course => {
+        console.log(`Course: ${course.coursename}, isFree: ${course.isFree}`);
+      });
+
+      // Vérifier si la réponse est un tableau et assigner les données à l'état des cours
       if (Array.isArray(response.data.data)) {
-        setCourses(response.data.data); // Ensure response is an array
+        setCourses(response.data.data); // Assigner les cours à l'état
       } else {
-        setCourses([]); // Default to an empty array if the response is not valid
+        setCourses([]); // Assigner un tableau vide si les données ne sont pas valides
       }
+
+      // Réinitialiser les erreurs
       setError("");
     } catch (error) {
+      // En cas d'erreur, afficher un message dans la console et l'interface
       console.error("Error fetching courses:", error);
       setError("Failed to fetch courses.");
     }
@@ -69,15 +79,10 @@ const StudentDashboard = () => {
 
   // Check if the student is enrolled in the course
   const isEnrolled = (course) => {
-    console.log("Checking enrollment for course:", course.coursename);
-    console.log("Course enrolled users:", course.enrolledUsers);
-    console.log("Current student ID:", studentId);
-
-    // Ensure that enrolledUsers is not null and contains the student's ID
     return course.enrolledUsers && Array.isArray(course.enrolledUsers) && course.enrolledUsers.includes(studentId);
   };
 
-  // Handle enrollment and payment
+  // Handle enrollment for free courses
   const handleEnroll = (courseId, isFree) => {
     console.log(`Handle enroll for course: ${courseId}, isFree: ${isFree}`);
 
@@ -126,20 +131,17 @@ const StudentDashboard = () => {
               <h3>{course.coursename}</h3>
               <p>{course.description}</p>
               <p>Difficulty: {course.difficulty}</p>
-              <p>{course.isFree ? "Free" : `Price: $${course.price}`}</p>
+
+              {/* Only show price if the course is not free */}
+              {!course.isFree && <p>Price: ${course.price}</p>}
 
               {/* If enrolled in the course */}
               {isEnrolled(course) ? (
-                <>
-                  {/* Only show "Go to My Courses" for paid courses */}
-                  {!course.isFree && (
-                    <button onClick={handleRedirectToMyCourses} className={styles.enroll_btn}>
-                      Go to My Courses
-                    </button>
-                  )}
-                </>
+                <button onClick={handleRedirectToMyCourses} className={styles.enroll_btn}>
+                  Go to My Courses
+                </button>
               ) : (
-                // Show "Pay to Enroll" for paid courses or "Enroll in Course" for free courses
+                // Show "Enroll in Course" for free courses or "Pay to Enroll" for paid courses
                 <button onClick={() => handleEnroll(course._id, course.isFree)} className={styles.enroll_btn}>
                   {course.isFree ? "Enroll in Course" : "Pay to Enroll"}
                 </button>

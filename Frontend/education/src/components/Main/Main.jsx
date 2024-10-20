@@ -96,7 +96,7 @@ const Main = () => {
                                 <Link to="/studentdashboard">Student dashboard</Link>
                             </li>
                             <li>
-                                <Link to="/contact">Contact</Link>
+                                <Link to="/update">update</Link>
                             </li>
                         </>
                     )}
