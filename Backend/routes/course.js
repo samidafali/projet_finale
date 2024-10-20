@@ -10,7 +10,8 @@ const {
   addUserToCourse,
   getEnrolledCourses,
   enrollInCourse,
-  createCheckoutSession
+  createCheckoutSession,
+  getCourseVideos
 } = require("../controllers/courseController.js");
 const adminAuth = require("../middleware/adminMiddleware");
 const multer = require("multer");
@@ -54,4 +55,8 @@ router.post('/:courseId/create-checkout-session', studentAuth, (req, res, next) 
   console.log("Request received for checkout session with courseId:", req.params.courseId);
   next();
 }, createCheckoutSession);
+router.get('/:courseId/videos', studentAuth, getCourseVideos);
+router.get('/students/:studentId/courses', studentAuth, getEnrolledCourses);
+
+
 module.exports = router;

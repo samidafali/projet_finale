@@ -17,6 +17,7 @@ import StudentDashboard from "./components/Student/StudentDashboard.jsx";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import PaymentPage from "./components/Student/PaymentPage.jsx";
+import MyCourses from "./components/Student/MyCourses.jsx";
 function App() {
 	const user = localStorage.getItem("token");
 	const stripePromise = loadStripe('pk_test_51PgA1t2MMlJMgqqrMy2H0fyasxX68p6sYn7zJvFGBFB7xsrxBzsIgJDZg53NnlA14H59IHe5Z9eKnfXGaDAFtnS600Jd4dovCS');
@@ -34,8 +35,8 @@ function App() {
 			<Route path="/studentdashboard" element={<StudentDashboard />} />
 			<Route path="/teacher-create-course" element={<TeacherCreateCourse />} />
 			<Route path="/teacher-update-course" element={<UpdateCourse/>} />
-			<Route path="/payment/:courseId" element={<PaymentPage />} /> {/* Add the payment page route */}
-
+			<Route path="/payment/:courseId" element={<PaymentPage />} /> 
+			<Route path="/my-courses" element={<MyCourses />} />{/* Add the payment page route */}
 {/* Admin Routes */}
 <Route path="/admin-dashboard" element={<AdminDashboard />} />
   <Route path="/admin-create-course" element={<AdminCreateCourse />} />

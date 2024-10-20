@@ -83,14 +83,17 @@ const Main = () => {
                                 <Link to="/teacher-update-course">Update Courses</Link>
                             </li>
                             <li>
-                                <Link to="/teacher-create-course">create course</Link>
+                                <Link to="/teacher-create-course">Create Course</Link>
                             </li>
                         </>
                     )}
                     {role !== "admin" && role !== "teacher" && (
                         <>
                             <li>
-                                <Link to="/about">About</Link>
+                                <Link to="/my-courses">My Courses</Link> {/* Add "My Courses" link */}
+                            </li>
+                            <li>
+                                <Link to="/studentdashboard">Student dashboard</Link>
                             </li>
                             <li>
                                 <Link to="/contact">Contact</Link>

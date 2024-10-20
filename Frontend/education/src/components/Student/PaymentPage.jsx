@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import axios from "axios";
 import { useParams, useNavigate } from 'react-router-dom';
+//import './PaymentPage.css'; // Import the CSS
 
 const PaymentPage = () => {
   const { courseId } = useParams(); // Get courseId from the URL
