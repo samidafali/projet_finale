@@ -10,6 +10,8 @@ const sendMail = require("../utils/sendEmail.js");
 const cloudinary = require("../utils/cloudinary");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
+const Stripe = require('stripe');
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); 
 // Vérifier le rôle d'un utilisateur (Admin ou Teacher)
 const checkRole = (user, role) => {
   if (!user || !user.role) {
@@ -415,31 +417,82 @@ const getEnrolledCourses = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, enrolledCourses, "Enrolled courses fetched successfully"));
 });
 
-// Enroll a user in a course
-const enrollInCourse = asyncHandler(async (req, res) => {
-  const { courseId } = req.params; // Course ID from URL
-  const user = req.student; // Correctly use req.student from the middleware
 
+// Enroll a user in a course with payment integration
+const enrollInCourse = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+  const user = req.student;
+
+  // Logging the courseId and student
+  console.log("Enroll in Course called");
+  console.log("Course ID:", courseId);
+  console.log("Student ID:", user ? user._id : "No student found");
+
+  // Validate if the student is logged in
   if (!user) {
+      console.log("User not found or not logged in.");
       throw new ApiError(403, "User not found or not logged in.");
+  }
+
+  // Validate the courseId format
+  if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      console.log("Invalid Course ID");
+      return res.status(400).json({ message: "Invalid course ID" });
   }
 
   // Find the course by ID
   const course = await Course.findById(courseId);
   if (!course) {
+      console.log("Course not found with ID:", courseId);
       return res.status(404).json(new ApiResponse(404, null, "Course not found."));
   }
 
-  // Check if the user is already enrolled
+  console.log("Course found:", course);
+
+  // Check if the user is already enrolled in the course
   if (course.enrolledUsers.includes(user._id)) {
+      console.log("User already enrolled in the course");
       return res.status(400).json(new ApiResponse(400, null, "You are already enrolled in this course."));
   }
 
-  // Enroll the user in the course
+  // Handle paid courses
+  if (!course.isFree) {
+      console.log("Course is not free, proceeding with Stripe payment");
+
+      const session = await stripe.checkout.sessions.create({
+          payment_method_types: ['card'],
+          mode: 'payment',
+          success_url: `${process.env.CLIENT_SITE_URL}/checkout-success?sessionId={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${process.env.CLIENT_SITE_URL}/course/${courseId}`,
+          customer_email: user.email,
+          line_items: [
+              {
+                  price_data: {
+                      currency: 'cad',
+                      unit_amount: course.price * 100, // Convert price to cents
+                      product_data: {
+                          name: course.coursename,
+                          description: course.description,
+                          images: [course.imageUrl],
+                      },
+                  },
+                  quantity: 1,
+              },
+          ],
+      });
+
+      console.log("Stripe session created with ID:", session.id);
+
+      // Send the session URL to the frontend
+      return res.status(200).json({ success: true, sessionId: session.id, url: session.url });
+  }
+
+  // If the course is free, enroll the user directly
   course.enrolledUsers.push(user._id);
   await course.save();
 
-  // Optionally, send a confirmation email
+  console.log("User enrolled successfully in the course:", course);
+
   await sendMail(
       user.email,
       "Course Enrollment Confirmation",
@@ -448,6 +501,56 @@ const enrollInCourse = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, course, "Successfully enrolled in the course."));
 });
+
+// Create checkout session for Stripe
+const createCheckoutSession = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const user = req.student; // Assuming req.student contains the logged-in user
+
+    console.log("Request received to create checkout session.");
+    console.log("Course ID:", courseId);
+    console.log("Logged in user:", user ? user.email : "No user found");
+
+    if (!user || !user.email) {
+      console.log("User email missing in request.");
+      return res.status(400).json({ message: "User email is required for payment" });
+    }
+
+    // Find the course by its ID
+    const course = await Course.findById(courseId);
+    if (!course) {
+      console.log("Course not found.");
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    console.log("Course found:", course.coursename);
+
+    // Create the PaymentIntent with Stripe
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: course.price * 100, // Amount in cents
+      currency: 'cad',
+      payment_method_types: ['card'],
+      receipt_email: user.email,
+      metadata: {
+        courseId: course._id.toString(),
+        userId: user._id.toString(),
+      },
+    });
+
+    console.log("Stripe payment intent created:", paymentIntent.id);
+
+    res.status(200).json({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    console.error("Error creating payment intent:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
 
 
 
@@ -461,5 +564,6 @@ module.exports = {
   addTeacherToCourse,
   addUserToCourse,
   getEnrolledCourses,
-  enrollInCourse
+  enrollInCourse,
+  createCheckoutSession
 };

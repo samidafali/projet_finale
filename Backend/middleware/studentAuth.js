@@ -2,26 +2,28 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../models/user");
 
 const studentAuth = async (req, res, next) => {
-    const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
+  try {
+    const token = req.header("Authorization").replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWTPRIVATEKEY);
+    console.log("Token received:", token);
+    console.log("Decoded token:", decoded);
 
-    if (!token) {
-        return res.status(401).json({ message: "Access denied, no token provided" });
+    // Check if the user's role is 'user' instead of 'student'
+    const student = await User.findOne({ _id: decoded._id, role: 'user' });
+
+    if (!student) {
+      console.log("Student not found.");
+      throw new Error("Student not found.");
     }
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWTPRIVATEKEY);
-        const student = await User.findById(decoded._id);
-
-        if (!student) {
-            return res.status(401).json({ message: "Access denied, student not found" });
-        }
-
-        req.student = student; // Ensure this is set correctly
-        next();
-    } catch (error) {
-        res.status(400).json({ message: "Invalid token" });
-    }
+    req.student = student; // Set the student in the request
+    next();
+  } catch (error) {
+    console.log("Authentication failed:", error.message);
+    res.status(401).send({ error: "Please authenticate as a student." });
+  }
 };
 
-module.exports = studentAuth;
 
+
+module.exports = studentAuth;
