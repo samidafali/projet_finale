@@ -149,9 +149,9 @@ const AdminCreateCourse = () => {
           <div>
             <label>Course Difficulty</label>
             <select name="difficulty" value={courseData.difficulty} onChange={handleChange}>
-              <option value="facile">Facile</option>
-              <option value="moyen">Moyen</option>
-              <option value="difficile">Difficile</option>
+              <option value="easy">Facile</option>
+              <option value="meduim">Moyen</option>
+              <option value="hard">Difficile</option>
             </select>
           </div>
 

@@ -20,7 +20,7 @@ const courseSchema = new mongoose.Schema({
       title: { type: String }
     }
   ],
-  difficulty: { type: String, enum: ["facile", "moyen", "difficile"], required: true }, // Difficulty level
+  difficulty: { type: String, enum: ["easy", "meduim", "hard"], required: true }, // Difficulty level
   isFree: { type: Boolean, default: true }, // Whether the course is free or paid
   price: { type: Number, default: 0 }, // Price of the course if it's not free
 });

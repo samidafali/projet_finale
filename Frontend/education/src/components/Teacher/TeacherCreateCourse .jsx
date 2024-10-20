@@ -190,9 +190,9 @@ const TeacherCreateCourse = () => {
             onChange={handleChange}
             className={styles.select}
           >
-            <option value="facile">Easy</option>
-            <option value="moyen">Medium</option>
-            <option value="difficile">Hard</option>
+            <option value="easy">facile</option>
+            <option value="meduim">moyen</option>
+            <option value="hard">difficile</option>
           </select>
 
           {/* Free or paid course */}

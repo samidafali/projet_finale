@@ -51,6 +51,7 @@ const getAllCourses = asyncHandler(async (req, res) => {
 // Récupérer les détails d'un cours spécifique par ID
 const getCourseById = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  const user = req.student; // Get the current logged-in student
 
   const singleCourse = await Course.findById(id)
     .populate('enrolledteacher', 'firstName lastName email')
@@ -60,10 +61,21 @@ const getCourseById = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Course not found");
   }
 
+  // Check if the user is enrolled
+  const isEnrolled = singleCourse.enrolledUsers.includes(user._id);
+
+  // If the user is not enrolled, do not return the videos
+  const responseCourse = {
+    ...singleCourse.toObject(),
+    videos: isEnrolled ? singleCourse.videos : [], // Only return videos if enrolled
+  };
+
   return res
     .status(200)
-    .json(new ApiResponse(200, singleCourse, "Course details fetched successfully"));
+    .json(new ApiResponse(200, responseCourse, "Course details fetched successfully"));
 });
+
+
 
 
 
@@ -403,6 +415,42 @@ const getEnrolledCourses = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, enrolledCourses, "Enrolled courses fetched successfully"));
 });
 
+// Enroll a user in a course
+const enrollInCourse = asyncHandler(async (req, res) => {
+  const { courseId } = req.params; // Course ID from URL
+  const user = req.student; // Correctly use req.student from the middleware
+
+  if (!user) {
+      throw new ApiError(403, "User not found or not logged in.");
+  }
+
+  // Find the course by ID
+  const course = await Course.findById(courseId);
+  if (!course) {
+      return res.status(404).json(new ApiResponse(404, null, "Course not found."));
+  }
+
+  // Check if the user is already enrolled
+  if (course.enrolledUsers.includes(user._id)) {
+      return res.status(400).json(new ApiResponse(400, null, "You are already enrolled in this course."));
+  }
+
+  // Enroll the user in the course
+  course.enrolledUsers.push(user._id);
+  await course.save();
+
+  // Optionally, send a confirmation email
+  await sendMail(
+      user.email,
+      "Course Enrollment Confirmation",
+      `Dear ${user.firstName}, you have successfully enrolled in the course ${course.coursename}!`
+  );
+
+  return res.status(200).json(new ApiResponse(200, course, "Successfully enrolled in the course."));
+});
+
+
+
 module.exports = {
   getAllCourses,
   getCourseById,
@@ -412,5 +460,6 @@ module.exports = {
   approveCourse,
   addTeacherToCourse,
   addUserToCourse,
-  getEnrolledCourses
+  getEnrolledCourses,
+  enrollInCourse
 };
