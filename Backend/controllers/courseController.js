@@ -27,16 +27,14 @@ const getAllCourses = asyncHandler(async (req, res) => {
   const user = req.admin || req.teacher || req.user;
   let courses;
 
-  console.log("Fetching all courses...");
-
   if (user && checkRole(user, 'admin')) {
     courses = await Course.find()
       .populate('enrolledteacher', 'firstName lastName email')
-      .select('coursename description schedule enrolledteacher imageUrl videos difficulty price isFree enrolledUsers');
+      .select('coursename description schedule enrolledteacher imageUrl videos difficulty price isFree enrolledUsers category pdfUrl');  // Ajout du champ pdfUrl
   } else {
     courses = await Course.find({ isapproved: true })
       .populate('enrolledteacher', 'firstName lastName email')
-      .select('coursename description schedule enrolledteacher imageUrl videos difficulty price isFree enrolledUsers');
+      .select('coursename description schedule enrolledteacher imageUrl videos difficulty price isFree enrolledUsers category pdfUrl');  // Ajout du champ pdfUrl
   }
 
   return res.status(200).json(new ApiResponse(200, courses, "Courses fetched successfully"));
@@ -46,36 +44,41 @@ const getAllCourses = asyncHandler(async (req, res) => {
 
 
 
+
+
+
 // Récupérer les détails d'un cours spécifique par ID
 const getCourseById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const user = req.student;  // Utilisez req.student pour obtenir l'utilisateur
-
-  console.log("Course ID from params:", id);
-  console.log("User from token:", user);  // Vérifiez si l'utilisateur est bien trouvé
+  const user = req.student;
 
   if (!user || !user._id) {
-    console.error('User or user ID is missing:', user);
     return res.status(400).json({ message: "User ID not found in request." });
   }
 
   const course = await Course.findById(id)
     .populate('enrolledteacher', 'firstName lastName email')
-    .select('coursename description schedule enrolledteacher imageUrl videos difficulty price');
+    .select('coursename description schedule enrolledteacher imageUrl videos difficulty price category pdfUrl'); // Include pdfUrl for later filtering
 
   if (!course) {
-    console.error('Course not found with ID:', id);
     return res.status(404).json({ message: "Course not found" });
   }
 
   const isEnrolled = course.enrolledUsers.includes(user._id);
+
+  // Filter out the pdfUrl and videos if the user is not enrolled
   const response = {
     ...course.toObject(),
-    videos: isEnrolled ? course.videos : [],  // Les vidéos ne sont retournées que si l'utilisateur est inscrit
+    videos: isEnrolled ? course.videos : [],  // Show videos only if enrolled
+    pdfUrl: isEnrolled ? course.pdfUrl : null // Show PDF only if enrolled
   };
 
   return res.status(200).json(response);
 });
+
+
+
+
 
 
 
@@ -119,13 +122,18 @@ const getCourseVideos = asyncHandler(async (req, res) => {
 // Créer un nouveau cours (Admin ou Teacher)
 const createCourse = asyncHandler(async (req, res) => {
   try {
-    const { coursename, description, schedule, videoTitles, difficulty, isFree, price } = req.body;
+    const { coursename, description, schedule, videoTitles, difficulty, isFree, price, category } = req.body;
+
+    if (!category) {
+      return res.status(400).json({ message: "Category is required" });
+    }
 
     const isFreeBool = isFree === 'true' || isFree === true;
     const coursePrice = isFreeBool ? 0 : price;
 
     let imageUrl = null;
     let videos = [];
+    let pdfUrl = null; // Ajouter une variable pour l'URL du PDF
 
     // Handle image upload
     if (req.files && req.files.image) {
@@ -148,6 +156,15 @@ const createCourse = asyncHandler(async (req, res) => {
       }
     }
 
+    // Handle PDF upload
+    if (req.files && req.files.pdf) {
+      const pdfResult = await cloudinary.uploader.upload(req.files.pdf[0].path, {
+        folder: "courses/pdf",
+        resource_type: "raw",
+      });
+      pdfUrl = pdfResult.secure_url; // URL du PDF
+    }
+
     // Create a new course
     const newCourse = await Course.create({
       coursename,
@@ -155,9 +172,11 @@ const createCourse = asyncHandler(async (req, res) => {
       schedule: JSON.parse(schedule),
       imageUrl,
       videos,
+      pdfUrl, // Enregistrer l'URL du PDF
       difficulty,
       isFree: isFreeBool,
       price: coursePrice,
+      category,
       isapproved: true
     });
 
@@ -167,6 +186,8 @@ const createCourse = asyncHandler(async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error", error });
   }
 });
+
+
 
 
 
@@ -185,7 +206,7 @@ const createCourse = asyncHandler(async (req, res) => {
 
 const updateCourse = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { coursename, description, schedule, difficulty, isFree, price } = req.body;
+  const { coursename, description, schedule, difficulty, isFree, price, category } = req.body;
   const user = req.admin || req.teacher;
 
   if (!user) {
@@ -204,9 +225,9 @@ const updateCourse = asyncHandler(async (req, res) => {
       difficulty,
       isFree: isFree === "true",
       price: isFree === "false" ? price : 0,
+      category,
     };
 
-    // Mise à jour du planning (schedule) si fourni
     if (schedule) {
       try {
         updateFields.schedule = JSON.parse(schedule);
@@ -215,45 +236,44 @@ const updateCourse = asyncHandler(async (req, res) => {
       }
     }
 
-    // Gestion des fichiers image et vidéo
-    let imageUrl = existingCourse.imageUrl; // Garder l'ancienne image si aucune nouvelle n'est téléchargée
-    let videos = existingCourse.videos || []; // Garder les anciennes vidéos si aucune nouvelle n'est téléchargée
-
-    if (req.files) {
-      // Gestion de l'image
-      if (req.files.image) {
-        const imageResult = await cloudinary.uploader.upload(req.files.image[0].path, {
-          folder: "courses",
-          resource_type: "image",
-        });
-        imageUrl = imageResult.secure_url; // Mettre à jour avec la nouvelle image
-      }
-
-      // Gestion des vidéos
-      if (req.files.videos) {
-        videos = [];
-        for (let i = 0; i < req.files.videos.length; i++) {
-          const video = req.files.videos[i];
-          const videoResult = await cloudinary.uploader.upload(video.path, {
-            folder: "courses/videos",
-            resource_type: "video",
-          });
-          videos.push({ url: videoResult.secure_url, title: req.body.videoTitles[i] || "Untitled Video" });
-        }
-      }
+    // Handle image, video, and PDF updates
+    if (req.files && req.files.image) {
+      const imageResult = await cloudinary.uploader.upload(req.files.image[0].path, {
+        folder: "courses",
+        resource_type: "image",
+      });
+      updateFields.imageUrl = imageResult.secure_url;
     }
 
-    // Ajouter imageUrl et vidéos à updateFields
-    updateFields.imageUrl = imageUrl;
-    updateFields.videos = videos;
+    if (req.files && req.files.videos) {
+      const videos = [];
+      for (let i = 0; i < req.files.videos.length; i++) {
+        const video = req.files.videos[i];
+        const videoResult = await cloudinary.uploader.upload(video.path, {
+          folder: "courses/videos",
+          resource_type: "video",
+        });
+        videos.push({ url: videoResult.secure_url, title: videoTitles[i] });
+      }
+      updateFields.videos = videos;
+    }
 
-    // Mise à jour du cours dans la base de données
+    if (req.files && req.files.pdf) {
+      const pdfResult = await cloudinary.uploader.upload(req.files.pdf[0].path, {
+        folder: "courses/pdf",
+        resource_type: "raw",
+      });
+      updateFields.pdfUrl = pdfResult.secure_url; // Update the PDF URL
+    }
+
     const updatedCourse = await Course.findByIdAndUpdate(id, { $set: updateFields }, { new: true });
     return res.status(200).json(new ApiResponse(200, updatedCourse, "Course updated successfully"));
   } else {
     throw new ApiError(403, "Access denied, you are not authorized to update this course");
   }
 });
+
+
 
 
 
@@ -418,6 +438,7 @@ const addUserToCourse = asyncHandler(async (req, res) => {
 
 
 // Récupérer les cours auxquels un utilisateur est inscrit
+// Récupérer les cours auxquels un utilisateur est inscrit
 const getEnrolledCourses = asyncHandler(async (req, res) => {
   const { studentId } = req.params;
 
@@ -426,8 +447,9 @@ const getEnrolledCourses = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
-  // Sélectionner les cours auxquels l'utilisateur est inscrit et inclure `imageUrl`
-  const enrolledCourses = await Course.find({ enrolledUsers: studentId }).select("coursename description imageUrl");
+  // Select enrolled courses and include `pdfUrl` along with other fields
+  const enrolledCourses = await Course.find({ enrolledUsers: studentId })
+    .select("coursename description imageUrl pdfUrl"); // Ensure pdfUrl is included
 
   if (!enrolledCourses || enrolledCourses.length === 0) {
     throw new ApiError(404, "No courses found for the specified user");
@@ -437,6 +459,7 @@ const getEnrolledCourses = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, enrolledCourses, "Enrolled courses fetched successfully"));
 });
+
 
 
 

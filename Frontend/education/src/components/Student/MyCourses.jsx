@@ -3,6 +3,7 @@ import axios from 'axios';
 import styles from './styles.module.css';
 import { useNavigate } from 'react-router-dom';
 import Main from '../Main/Main';
+
 const MyCourses = () => {
   const [courses, setCourses] = useState([]); // State to store enrolled courses
   const [videosVisibility, setVideosVisibility] = useState({}); // State to store visibility of videos
@@ -12,19 +13,16 @@ const MyCourses = () => {
 
   const studentId = localStorage.getItem("studentId");
   const token = localStorage.getItem("token");
-  const navigate = useNavigate();
 
   // Fetch enrolled courses for the student
   useEffect(() => {
     const fetchEnrolledCourses = async () => {
       try {
-        console.log("Fetching enrolled courses for student:", studentId);
-
         const response = await axios.get(`http://localhost:8050/api/courses/students/${studentId}/courses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log("Enrolled courses response:", response.data);
+        console.log("Enrolled courses response:", response.data); // Log to confirm pdfUrl exists
         setCourses(response.data.data || []); // Update state with enrolled courses
         setError("");
       } catch (error) {
@@ -39,17 +37,12 @@ const MyCourses = () => {
   // Fetch videos for a specific course
   const fetchVideosForCourse = async (courseId) => {
     try {
-      console.log(`Fetching videos for course ID: ${courseId}`);
-
       const response = await axios.get(`http://localhost:8050/api/courses/${courseId}/videos`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("Videos response:", response.data);
-
       return response.data.videos;
     } catch (error) {
-      console.error("Error fetching course videos:", error);
       setError("Failed to fetch course videos.");
       return [];
     }
@@ -57,7 +50,6 @@ const MyCourses = () => {
 
   // Toggle videos visibility for a course and switch to full screen view
   const handleSelectCourse = async (courseId) => {
-    // If selecting a course for the first time, fetch its videos
     if (!videosVisibility[courseId]) {
       const videos = await fetchVideosForCourse(courseId);
       setVideosVisibility((prevState) => ({
@@ -67,11 +59,9 @@ const MyCourses = () => {
       setSuccess("Videos fetched successfully!");
     }
 
-    // Set the selected course to full screen
-    setSelectedCourseId(courseId);
+    setSelectedCourseId(courseId); // Set the selected course to full screen
   };
 
-  // Back to normal view
   const handleBackToCourses = () => {
     setSelectedCourseId(null); // Deselect the course and show all courses
   };
@@ -101,6 +91,13 @@ const MyCourses = () => {
                   alt={course.coursename} 
                   className={styles.course_image} 
                 />
+              )}
+
+              {/* Show PDF link if available */}
+              {course.pdfUrl && (
+                <div>
+                  <a href={course.pdfUrl} target="_blank" rel="noopener noreferrer">Download Course PDF</a>
+                </div>
               )}
 
               {/* Button to view course in full screen */}

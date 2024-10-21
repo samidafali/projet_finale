@@ -13,9 +13,11 @@ const UpdateCourse = () => {
     difficulty: "easy", // Default difficulty
     isFree: "true", // Default to free course
     price: "", // Price for paid courses
+    category: "", // New field for category
     image: null, // Course image
   });
   const [videos, setVideos] = useState([{ title: "", file: null }]); // Dynamic video fields
+  const [pdf, setPdf] = useState(null); // State to handle PDF upload
   const [error, setError] = useState(null);
   const [loadingCourses, setLoadingCourses] = useState(true); // Loading state for courses
   const [loadingDetails, setLoadingDetails] = useState(false); // Loading state for course details
@@ -33,7 +35,6 @@ const UpdateCourse = () => {
         setLoadingCourses(false);
       } catch (error) {
         setError("Failed to fetch courses");
-        console.error(error);
         setLoadingCourses(false);
       }
     };
@@ -56,7 +57,6 @@ const UpdateCourse = () => {
         setLoadingDetails(false);
       } catch (error) {
         setError("Failed to fetch course details");
-        console.error(error);
         setLoadingDetails(false);
       }
     };
@@ -82,6 +82,10 @@ const UpdateCourse = () => {
       ...courseData,
       [e.target.name]: e.target.files[0], // Handle single file (for image)
     });
+  };
+
+  const handlePdfChange = (e) => {
+    setPdf(e.target.files[0]); // Handle PDF file input
   };
 
   // Handle video fields changes
@@ -111,6 +115,7 @@ const UpdateCourse = () => {
     formData.append("schedule", JSON.stringify(courseData.schedule));
     formData.append("difficulty", courseData.difficulty);
     formData.append("isFree", courseData.isFree);
+    formData.append("category", courseData.category); // Append category
     if (courseData.isFree === "false") {
       formData.append("price", courseData.price);
     }
@@ -128,6 +133,11 @@ const UpdateCourse = () => {
       }
     });
 
+    // Append PDF if selected
+    if (pdf) {
+      formData.append("pdf", pdf); // Append the PDF file
+    }
+
     try {
       const token = localStorage.getItem("token");
 
@@ -143,11 +153,9 @@ const UpdateCourse = () => {
         },
       });
 
-      console.log("Course updated successfully:", response.data);
       setUpdateSuccess(true); // Show success message
     } catch (error) {
       setError("Failed to update the course");
-      console.error("Error updating the course:", error.response ? error.response.data : error.message);
       setUpdateSuccess(false); // Hide success message if there's an error
     }
   };
@@ -247,8 +255,26 @@ const UpdateCourse = () => {
                 />
               )}
 
+              <label htmlFor="category">Category</label>
+              <select
+                name="category"
+                value={courseData.category}
+                onChange={handleInputChange}
+                className={styles.select}
+                required
+              >
+                <option value="">Select Category</option>
+                <option value="programming">Programming</option>
+                <option value="design">Design</option>
+                <option value="marketing">Marketing</option>
+                {/* Add more categories as needed */}
+              </select>
+
               <label htmlFor="image">Upload Image</label>
               <input type="file" name="image" onChange={handleFileChange} className={styles.file_input} />
+
+              <label htmlFor="pdf">Upload Course PDF</label>
+              <input type="file" name="pdf" onChange={handlePdfChange} className={styles.file_input} />
 
               {/* Video inputs */}
               <div className={styles.video_inputs_container}>

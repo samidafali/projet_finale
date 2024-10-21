@@ -33,15 +33,18 @@ router.post(
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "videos", maxCount: 5 },
+    { name: "pdf", maxCount: 1 }, // Ajout du champ pour les fichiers PDF
   ]),
   createCourse
 );
+
 router.put(
   "/:id",
   adminAuth,
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "videos", maxCount: 5 },
+    { name: "pdf", maxCount: 1 }, // Ajout du champ pour les fichiers PDF
   ]),
   updateCourse
 );

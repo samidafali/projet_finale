@@ -12,13 +12,15 @@ const AdminCreateCourse = () => {
     enrolledteacher: "", // Store selected teacher's ID here
     difficulty: "easy", // Default difficulty level
     isFree: "true", // Default value for course free status
-    price: 0 // Default price (only relevant if the course is paid)
+    price: 0, // Default price (only relevant if the course is paid)
+    category: "" // Add the category state here
   });
 
   const [newSchedule, setNewSchedule] = useState({ day: "", starttime: "", endtime: "" }); // New schedule entry
   const [successMessage, setSuccessMessage] = useState(""); // State for success message
   const [image, setImage] = useState(null); // State to store selected image
   const [videos, setVideos] = useState([{ title: "", file: null }]); // State to store selected videos with titles
+  const [pdfFile, setPdfFile] = useState(null); // State to store selected PDF
 
   // Handle input changes for course data
   const handleChange = (e) => {
@@ -64,6 +66,11 @@ const AdminCreateCourse = () => {
     setVideos([...videos, { title: "", file: null }]);
   };
 
+  // Handle PDF upload
+  const handlePdfChange = (e) => {
+    setPdfFile(e.target.files[0]); // Set selected PDF file
+  };
+
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -75,7 +82,8 @@ const AdminCreateCourse = () => {
     formData.append("schedule", JSON.stringify(courseData.schedule));
     formData.append("difficulty", courseData.difficulty);
     formData.append("isFree", courseData.isFree);
-    
+    formData.append("category", courseData.category); // Add category to formData
+
     // If the course is not free, include the price
     if (courseData.isFree === "false") {
       formData.append("price", courseData.price);
@@ -93,6 +101,11 @@ const AdminCreateCourse = () => {
         formData.append(`videoTitles[]`, video.title); // Append the corresponding title
       }
     });
+
+    // Append PDF if selected
+    if (pdfFile) {
+      formData.append("pdf", pdfFile);
+    }
 
     axios
       .post("http://localhost:8050/api/courses", formData, {
@@ -215,6 +228,19 @@ const AdminCreateCourse = () => {
             </ul>
           </div>
 
+          {/* Category selection */}
+          <div>
+            <label>Category</label>
+            <input
+              type="text"
+              name="category"
+              placeholder="Course Category"
+              value={courseData.category}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
           {/* Image input */}
           <div className={styles.file_input}>
             <label htmlFor="image">Course Image</label>
@@ -245,6 +271,12 @@ const AdminCreateCourse = () => {
                 Add Another Video
               </button>
             )}
+          </div>
+
+          {/* PDF input */}
+          <div className={styles.file_input}>
+            <label htmlFor="pdf">Course PDF</label>
+            <input type="file" id="pdf" name="pdf" accept="application/pdf" onChange={handlePdfChange} />
           </div>
 
           <button type="submit">Create Course</button>

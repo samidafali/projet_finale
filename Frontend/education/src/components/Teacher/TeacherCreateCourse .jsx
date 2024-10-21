@@ -11,11 +11,13 @@ const TeacherCreateCourse = () => {
     difficulty: "easy", // Default difficulty
     isFree: "true", // Default to free course
     price: "", // Price for paid courses
+    category: "", // New field for category
   });
 
   const [newSchedule, setNewSchedule] = useState({ day: "", starttime: "", endtime: "" }); // New schedule entry
   const [image, setImage] = useState(null); // State to handle image upload
   const [videos, setVideos] = useState([{ title: "", file: null }]); // Dynamic video fields
+  const [pdf, setPdf] = useState(null); // State to handle PDF upload
   const [successMessage, setSuccessMessage] = useState(""); // State for success message
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
 
@@ -43,6 +45,11 @@ const TeacherCreateCourse = () => {
     setImage(e.target.files[0]);
   };
 
+  // Handle PDF file upload
+  const handlePdfChange = (e) => {
+    setPdf(e.target.files[0]);
+  };
+
   // Handle video fields changes
   const handleVideoChange = (index, field, value) => {
     const updatedVideos = [...videos];
@@ -65,6 +72,8 @@ const TeacherCreateCourse = () => {
     formData.append("schedule", JSON.stringify(courseData.schedule));
     formData.append("difficulty", courseData.difficulty);
     formData.append("isFree", courseData.isFree);
+    formData.append("category", courseData.category); // Append category
+
     if (courseData.isFree === "false") {
       formData.append("price", courseData.price);
     }
@@ -82,14 +91,19 @@ const TeacherCreateCourse = () => {
       }
     });
 
+    // Append PDF if selected
+    if (pdf) {
+      formData.append("pdf", pdf); // Append the PDF file
+    }
+
     axios
       .post("http://localhost:8050/api/courses", formData, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // Add the Authorization header
       })
       .then((response) => {
-        console.log("Course created successfully:", response.data);
         setSuccessMessage("Course created successfully and pending approval!"); // Set success message
         setErrorMessage(""); // Clear any previous error
+
         // Optionally, reset the form
         setCourseData({
           coursename: "",
@@ -98,12 +112,13 @@ const TeacherCreateCourse = () => {
           difficulty: "easy",
           isFree: "true",
           price: "",
+          category: "", // Reset category
         });
         setImage(null);
         setVideos([{ title: "", file: null }]);
+        setPdf(null); // Reset PDF
       })
       .catch((error) => {
-        console.error("Error creating course:", error);
         setErrorMessage(
           error.response && error.response.data.message
             ? error.response.data.message
@@ -115,8 +130,8 @@ const TeacherCreateCourse = () => {
 
   return (
     <div>
-      <Main/>
-     
+      <Main />
+
       <div className={styles.create_course_container}>
         <h2>Create a New Course</h2>
 
@@ -190,9 +205,9 @@ const TeacherCreateCourse = () => {
             onChange={handleChange}
             className={styles.select}
           >
-            <option value="easy">facile</option>
-            <option value="meduim">moyen</option>
-            <option value="hard">difficile</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
           </select>
 
           {/* Free or paid course */}
@@ -220,6 +235,22 @@ const TeacherCreateCourse = () => {
             />
           )}
 
+          {/* Category dropdown */}
+          <label htmlFor="category">Category</label>
+          <select
+            name="category"
+            value={courseData.category}
+            onChange={handleChange}
+            className={styles.select}
+            required
+          >
+            <option value="">Select Category</option>
+            <option value="programming">Programming</option>
+            <option value="design">Design</option>
+            <option value="marketing">Marketing</option>
+            {/* Add more categories as needed */}
+          </select>
+
           {/* Image upload */}
           <label htmlFor="image">Course Image</label>
           <input
@@ -227,6 +258,16 @@ const TeacherCreateCourse = () => {
             name="image"
             accept="image/*"
             onChange={handleImageChange}
+            className={styles.file_input}
+          />
+
+          {/* PDF upload */}
+          <label htmlFor="pdf">Course PDF</label>
+          <input
+            type="file"
+            name="pdf"
+            accept="application/pdf"
+            onChange={handlePdfChange}
             className={styles.file_input}
           />
 

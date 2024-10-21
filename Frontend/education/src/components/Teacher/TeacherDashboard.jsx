@@ -62,6 +62,10 @@ const TeacherDashboard = () => {
               <li key={course._id} className={styles.course_item}>
                 <h3>{course.coursename}</h3>
                 <p>{course.description}</p>
+                
+                {/* Display category */}
+                <p>Category: {course.category || "No category provided"}</p>
+
                 <p>
                   Schedule:{" "}
                   {course.schedule
@@ -97,6 +101,16 @@ const TeacherDashboard = () => {
                         />
                       </div>
                     ))}
+                  </div>
+                )}
+
+                {/* Display PDF link */}
+                {course.pdfUrl && (
+                  <div>
+                    <h4>Course PDF</h4>
+                    <a href={course.pdfUrl} target="_blank" rel="noopener noreferrer">
+                      Download PDF
+                    </a>
                   </div>
                 )}
 

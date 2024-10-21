@@ -16,6 +16,7 @@ const AdminUpdateCourse = () => {
     difficulty: "easy", // For difficulty level
     isFree: "true", // Course is free by default
     price: "", // Price (empty by default)
+    category: "" // Ajout du champ category
   });
   const [image, setImage] = useState(null); // Image file for the course
   const [videos, setVideos] = useState([{ title: "", file: null }]); // Video files with titles
@@ -33,7 +34,6 @@ const AdminUpdateCourse = () => {
         setCourses(response.data.data);
       })
       .catch((error) => {
-       
         setErrorMessage("Error fetching courses");
       });
 
@@ -43,10 +43,10 @@ const AdminUpdateCourse = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       .then((response) => {
-        setTeachers(response.data.data); // Set teachers without error handling
+        setTeachers(response.data.data);
       })
       .catch((error) => {
-        console.error("Error fetching teachers:", error); // Log the error but don't display it
+        console.error("Error fetching teachers:", error);
       });
   }, []);
 
@@ -61,7 +61,6 @@ const AdminUpdateCourse = () => {
           setCourseData(response.data.data);
         })
         .catch((error) => {
-          
           setErrorMessage("");
         });
     }
@@ -128,6 +127,8 @@ const AdminUpdateCourse = () => {
     formData.append("schedule", JSON.stringify(courseData.schedule));
     formData.append("difficulty", courseData.difficulty);
     formData.append("isFree", courseData.isFree);
+    formData.append("category", courseData.category); // Ajouter la catégorie
+
     if (courseData.isFree === "false") {
       formData.append("price", courseData.price);
     }
@@ -158,7 +159,6 @@ const AdminUpdateCourse = () => {
         setErrorMessage("");
       })
       .catch((error) => {
-       
         setErrorMessage("Error updating course");
       });
   };
@@ -282,6 +282,19 @@ const AdminUpdateCourse = () => {
               onSelect={handleTeacherSelect}
               teachers={teachers} // Pass the fetched teachers
             />
+
+            {/* Category input */}
+            <div className={styles.file_input}>
+              <label htmlFor="category">Category</label>
+              <input
+                type="text"
+                id="category"
+                name="category"
+                placeholder="Enter course category"
+                value={courseData.category}
+                onChange={handleInputChange}
+              />
+            </div>
 
             {/* Image input */}
             <div className={styles.file_input}>

@@ -13,7 +13,6 @@ const AdminCourses = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       })
       .then((response) => {
-        console.log("Courses fetched:", response.data.data);
         setCourses(response.data.data || []); // Ensure courses is an array
       })
       .catch((error) => {
@@ -30,7 +29,6 @@ const AdminCourses = () => {
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       )
       .then((response) => {
-        console.log(`Course ${isapproved ? 'approved' : 'rejected'} successfully`);
         setCourses((prevCourses) =>
           prevCourses.map((course) =>
             course._id === courseId ? { ...course, isapproved } : course
@@ -51,7 +49,6 @@ const AdminCourses = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       })
       .then((response) => {
-        console.log("Course deleted successfully");
         setSuccessMessage("Course deleted successfully!");
         setCourses(courses.filter((course) => course._id !== courseId));
         setTimeout(() => setSuccessMessage(""), 3000);
@@ -85,6 +82,9 @@ const AdminCourses = () => {
                 <p>Course Price: ${course.price}</p>
               )}
 
+              {/* Display the course category */}
+              <p>Category: {course.category}</p>
+
               <p>
                 Schedule:{" "}
                 {course.schedule
@@ -111,6 +111,16 @@ const AdminCourses = () => {
                       <video key={index} src={video.url} controls width="300" />
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Display course PDF */}
+              {course.pdfUrl && (
+                <div>
+                  <h4>Course PDF:</h4>
+                  <a href={course.pdfUrl} target="_blank" rel="noopener noreferrer">
+                    Download PDF
+                  </a>
                 </div>
               )}
 
