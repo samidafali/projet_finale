@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import styles from './styles.module.css';
-import { useNavigate } from 'react-router-dom';
 import Main from '../Main/Main';
+import ChatWithCourse from './ChatWithCourse'; // Import the ChatWithCourse component
 
 const MyCourses = () => {
   const [courses, setCourses] = useState([]); // State to store enrolled courses
@@ -21,8 +21,6 @@ const MyCourses = () => {
         const response = await axios.get(`http://localhost:8050/api/courses/students/${studentId}/courses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        console.log("Enrolled courses response:", response.data); // Log to confirm pdfUrl exists
         setCourses(response.data.data || []); // Update state with enrolled courses
         setError("");
       } catch (error) {
@@ -40,7 +38,6 @@ const MyCourses = () => {
       const response = await axios.get(`http://localhost:8050/api/courses/${courseId}/videos`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       return response.data.videos;
     } catch (error) {
       setError("Failed to fetch course videos.");
@@ -58,7 +55,6 @@ const MyCourses = () => {
       }));
       setSuccess("Videos fetched successfully!");
     }
-
     setSelectedCourseId(courseId); // Set the selected course to full screen
   };
 
@@ -97,6 +93,13 @@ const MyCourses = () => {
               {course.pdfUrl && (
                 <div>
                   <a href={course.pdfUrl} target="_blank" rel="noopener noreferrer">Download Course PDF</a>
+                </div>
+              )}
+
+              {/* Include the ChatWithCourse component for this course */}
+              {course.pdfUrl && (
+                <div className={styles.chat_section}>
+                  <ChatWithCourse courseId={course._id} /> {/* Pass the course ID to the chatbot */}
                 </div>
               )}
 
