@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true }, // Ensure emails are unique
     password: { type: String, required: true },
     verified: { type: Boolean, default: false },
-    role: { type: String, enum: ['user', 'admin', 'teacher'], default: 'user' }, // User role
+    role: { type: String, enum: ['user', 'admin', 'teacher'], default: 'user' }, 
+   
 });
 
 userSchema.methods.generateAuthToken = function () {

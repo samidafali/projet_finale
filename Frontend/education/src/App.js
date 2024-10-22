@@ -19,6 +19,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import PaymentPage from "./components/Student/PaymentPage.jsx";
 import MyCourses from "./components/Student/MyCourses.jsx";
 import UpdateProfile from "./components/Student/UpdateProfile.jsx";
+import Recommendation from "./components/Student/Recommendation.jsx";
 function App() {
 	const user = localStorage.getItem("token");
 	const stripePromise = loadStripe('pk_test_51PgA1t2MMlJMgqqrMy2H0fyasxX68p6sYn7zJvFGBFB7xsrxBzsIgJDZg53NnlA14H59IHe5Z9eKnfXGaDAFtnS600Jd4dovCS');
@@ -47,7 +48,7 @@ function App() {
   <Route path="/admin-add-teacher-to-course" element={<AdminAddTeacherToCourse />} />
   <Route path="/admin-add-teacher" element={<AdminAddTeacherToCourse />} />
   <Route path="/admin-update-course" element={<AdminUpdateCourse />} />
-
+  <Route path="/recommendation" element={<Recommendation />} /> 
 
   
 					</Routes>

@@ -25,6 +25,7 @@ const courseSchema = new mongoose.Schema({
   isFree: { type: Boolean, default: true }, // Whether the course is free or paid
   price: { type: Number, default: 0 }, // Price of the course if it's not free
   category: { type: String, required: true }, // Nouvelle catégorie ajoutée
+
 });
 
 const Course = mongoose.model("Course", courseSchema);

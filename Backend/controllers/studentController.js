@@ -64,9 +64,35 @@ const getStudentById = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, student, "Student retrieved successfully"));
 });
 
+const updateUserInteraction = asyncHandler(async (req, res) => {
+    const { userId, courseId, timeSpent, videoId } = req.body; // Supposons que tu reçois ces informations
+
+    const user = await User.findById(userId);
+    if (!user) {
+        return res.status(404).json({ message: "User not found" });
+    }
+
+    const interaction = user.interactions.find(interaction => interaction.courseId.toString() === courseId);
+    if (interaction) {
+        interaction.timeSpent += timeSpent; // Update time spent
+        if (videoId) {
+            interaction.viewedVideos.push(videoId); // Add viewed video if provided
+        }
+    } else {
+        // Create new interaction record if it doesn't exist
+        user.interactions.push({ courseId, timeSpent, viewedVideos: videoId ? [videoId] : [] });
+    }
+
+    await user.save();
+
+    return res.status(200).json({ message: "User interaction updated successfully" });
+});
+
+
 module.exports = {
     getAllStudents,
     updateStudent,
     deleteStudent,
     getStudentById,
+    updateUserInteraction
 };
