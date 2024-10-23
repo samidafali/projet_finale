@@ -20,12 +20,14 @@ import PaymentPage from "./components/Student/PaymentPage.jsx";
 import MyCourses from "./components/Student/MyCourses.jsx";
 import UpdateProfile from "./components/Student/UpdateProfile.jsx";
 import Recommendation from "./components/Student/Recommendation.jsx";
+import Home from "./components/Home/Home.jsx"; // Import Home component
 function App() {
 	const user = localStorage.getItem("token");
 	const stripePromise = loadStripe('pk_test_51PgA1t2MMlJMgqqrMy2H0fyasxX68p6sYn7zJvFGBFB7xsrxBzsIgJDZg53NnlA14H59IHe5Z9eKnfXGaDAFtnS600Jd4dovCS');
 	return (
 		<Elements stripe={stripePromise}>
 		<Routes>
+		<Route path="/" element={<Home />} />
 			{user && <Route path="/" exact element={<Main />} />}
 			<Route path="/signup" exact element={<Signup />} />
 			<Route path="/login" exact element={<Login />} />

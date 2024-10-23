@@ -1,0 +1,116 @@
+/* home.module.css */
+
+.home_container {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f9f9f9; /* Couleur de fond claire */
+}
+
+.welcome_title {
+    font-size: 2.8rem; /* Augmenter la taille du texte */
+    margin-bottom: 10px;
+    color: #333; /* Couleur de texte foncé */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); /* Ajout d'une ombre */
+}
+
+.welcome_subtitle {
+    font-size: 1.5rem; /* Agrandir le sous-titre */
+    color: #666; /* Couleur de texte gris moyen */
+    margin-bottom: 30px; /* Ajout d'un espacement */
+}
+
+.hero_section {
+    position: relative;
+    margin: 20px 0;
+}
+
+.hero_image {
+    width: 80%; /* Ajuster la largeur de l'image principale */
+    max-width: 800px; /* Limiter la largeur maximale */
+    height: auto;
+    border-radius: 8px;
+    animation: fadeIn 1s ease-in-out; /* Animation de fondu */
+}
+
+.hero_text {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    text-align: center; /* Centrer le texte */
+}
+
+.sign_up_btn {
+    background-color: #4CAF50; /* Couleur de fond verte */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    text-decoration: none;
+}
+
+.sign_up_btn:hover {
+    background-color: #45a049; /* Vert plus foncé au survol */
+}
+
+.course_highlights {
+    margin-top: 40px; /* Augmenter l'espacement */
+}
+
+.course_card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    padding: 20px;
+    text-align: left;
+    width: 200px; /* Largeur fixe pour les cartes de cours */
+    display: inline-block; /* Alignement horizontal des cartes */
+    transition: transform 0.2s; /* Ajout d'une animation */
+}
+
+.course_card:hover {
+    transform: scale(1.05); /* Agrandir la carte lors du survol */
+}
+
+/* Réduire la taille des images des cours */
+.course_image {
+    width: 100%; /* Ajuster la largeur pour occuper 100% du cadre */
+    height: auto;
+    border-radius: 8px;
+}
+
+.arrow_link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 30px;
+    font-size: 1.5rem;
+    color: #007BFF; /* Couleur de texte bleue */
+    text-decoration: none; /* Pas de soulignement */
+    transition: color 0.2s; /* Transition de couleur */
+}
+
+.arrow_link:hover {
+    color: #0056b3; /* Couleur plus foncée au survol */
+}
+
+.arrow {
+    margin-right: 8px; /* Espacement entre la flèche et le texte */
+}
+
+/* Animation de fondu */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

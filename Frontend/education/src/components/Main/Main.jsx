@@ -1,20 +1,21 @@
+// Main.jsx
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 import axios from "axios";
 
-const Main = () => {
+const Main = ({ isHome }) => {
     const role = localStorage.getItem("role"); // Get role from localStorage after login
+    const token = localStorage.getItem("token"); // Get token from localStorage
     const navigate = useNavigate(); // Initialize useNavigate
 
     const handleLogout = async () => {
         try {
-            const token = localStorage.getItem("token"); // Retrieve token from localStorage
             if (!token) {
                 console.error("No token found, redirecting to login.");
                 navigate("/login"); // Redirect if token is missing
                 return;
             }
-
+    
             // Determine the API URL based on the role
             let logoutUrl = "";
             if (role === "admin") {
@@ -26,24 +27,31 @@ const Main = () => {
                 navigate("/login"); // Redirect for an invalid role
                 return;
             }
-
+    
             // API call to log out the user (admin or teacher)
-            await axios.post(logoutUrl, {}, {
+            const response = await axios.post(logoutUrl, {}, {
                 headers: {
                     Authorization: `Bearer ${token}` // Include token in headers
                 }
             });
-
-            // Remove token and role from localStorage
-            localStorage.removeItem("token");
-            localStorage.removeItem("role");
-
-            // Redirect to the login page
-            navigate("/login");
+    
+            // Check if the logout was successful
+            if (response.status === 200) {
+                // Remove token and role from localStorage
+                localStorage.removeItem("token");
+                localStorage.removeItem("role");
+    
+                // Redirect to the login page
+                navigate("/login");
+            } else {
+                console.error("Logout failed: ", response.data);
+                alert("Logout failed. Please try again.");
+            }
         } catch (error) {
             console.error("Error logging out", error.response ? error.response.data : error.message);
         }
     };
+    
 
     return (
         <div className={styles.main_container}>
@@ -55,6 +63,16 @@ const Main = () => {
                     <li>
                         <Link to="/">Home</Link>
                     </li>
+                    {isHome && !token && ( // Show Login and Signup links only if not logged in
+                        <>
+                            <li>
+                                <Link to="/login">Login</Link>
+                            </li>
+                            <li>
+                                <Link to="/signup">Signup</Link>
+                            </li>
+                        </>
+                    )}
                     {role === "admin" && (
                         <>
                             <li>
@@ -90,23 +108,25 @@ const Main = () => {
                     {role !== "admin" && role !== "teacher" && (
                         <>
                             <li>
-                                <Link to="/my-courses">My Courses</Link> {/* Add "My Courses" link */}
+                                <Link to="/my-courses">My Courses</Link>
                             </li>
                             <li>
-                                <Link to="/studentdashboard">Student dashboard</Link>
+                                <Link to="/studentdashboard">Student Dashboard</Link>
                             </li>
                             <li>
-                                <Link to="/recommendation">Course Recommendation</Link> {/* Lien vers la page de recommandation */}
+                                <Link to="/recommendation">Course Recommendation</Link>
                             </li>
                             <li>
-                                <Link to="/update">update</Link>
+                                <Link to="/update">Update</Link>
                             </li>
                         </>
                     )}
                 </ul>
-                <button className={styles.logout_btn} onClick={handleLogout}>
-                    Logout
-                </button>
+                {token && ( // Show Logout button only if the user is logged in
+                    <button className={styles.logout_btn} onClick={handleLogout}>
+                        Logout
+                    </button>
+                )}
             </nav>
         </div>
     );

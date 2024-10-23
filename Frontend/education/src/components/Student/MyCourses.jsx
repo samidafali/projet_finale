@@ -3,6 +3,8 @@ import axios from 'axios';
 import styles from './styles.module.css';
 import Main from '../Main/Main';
 import ChatWithCourse from './ChatWithCourse'; // Import the ChatWithCourse component
+import Quiz from './Quiz'; // Import the Quiz component
+import Footer from '../Footer/Footer';
 
 const MyCourses = () => {
   const [courses, setCourses] = useState([]); // State to store enrolled courses
@@ -10,6 +12,7 @@ const MyCourses = () => {
   const [selectedCourseId, setSelectedCourseId] = useState(null); // State for selected course in fullscreen
   const [error, setError] = useState(""); // Error message state
   const [success, setSuccess] = useState(""); // Success message state
+  const [showQuiz, setShowQuiz] = useState(false); // State to manage quiz visibility
 
   const studentId = localStorage.getItem("studentId");
   const token = localStorage.getItem("token");
@@ -60,6 +63,12 @@ const MyCourses = () => {
 
   const handleBackToCourses = () => {
     setSelectedCourseId(null); // Deselect the course and show all courses
+    setShowQuiz(false); // Hide quiz when going back
+  };
+
+  // Handle quiz visibility
+  const handleShowQuiz = () => {
+    setShowQuiz(true); // Show quiz when selected
   };
 
   return (
@@ -132,12 +141,22 @@ const MyCourses = () => {
                   <button className={styles.back_btn} onClick={handleBackToCourses}>
                     Back to Courses
                   </button>
+                  {/* Button to show quiz */}
+                  <button className={styles.quiz_btn} onClick={handleShowQuiz}>
+                    Take Quiz
+                  </button>
                 </div>
               )}
             </div>
           ))}
         </div>
+
+        {/* Show Quiz if selected */}
+        {showQuiz && selectedCourseId && (
+          <Quiz courseId={selectedCourseId} /> // Pass the selected course ID to Quiz component
+        )}
       </div>
+      <Footer/>
     </div>
   );
 };

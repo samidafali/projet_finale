@@ -1,3 +1,14 @@
+/* globals.css */
+body {
+    background-color: #F0F8FF; /* Light gray background for the entire app */
+    margin: 0; /* Remove default margin */
+    font-family: Arial, sans-serif; /* Set a default font */
+}
+
+* {
+    box-sizing: border-box; /* Add box-sizing for all elements */
+}
+
 /* General container */
 .courses_container {
     padding: 20px;
@@ -178,4 +189,106 @@
     color: green;
     font-size: 16px;
     margin-top: 10px;
+}
+
+
+/* Container for the recommendation component */
+.recommendation_container {
+    padding: 20px; /* Add some padding */
+    background-color: #f5f5f5; /* Light background color */
+}
+
+/* Header styles */
+h2 {
+    color: #333; /* Dark text color for header */
+    font-size: 1.5em; /* Header font size */
+    margin-bottom: 20px; /* Space below the header */
+}
+
+/* Form styles */
+form {
+    display: flex;
+    flex-direction: column; /* Stack form elements vertically */
+    margin-bottom: 20px; /* Space below the form */
+}
+
+/* Select input styles */
+select, input[type="text"] {
+    padding: 10px; /* Padding inside the inputs */
+    border: 1px solid #ccc; /* Border color */
+    border-radius: 4px; /* Rounded corners */
+    margin-bottom: 15px; /* Space below each input */
+    font-size: 1em; /* Font size */
+}
+
+/* Button styles */
+button {
+    padding: 12px; /* Button padding */
+    background-color: #007BFF; /* Primary color */
+    color: white; /* White text color */
+    border: none; /* No border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 1em; /* Font size */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+/* Course card styles */
+/* Course card styles */
+.course_card {
+    background-color: white; /* White background for the card */
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 15px; /* Increase padding for better spacing inside the card */
+    margin-bottom: 20px; /* Space below each card */
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+    width: 350px; /* Set a wider width for the card */
+    height: 400px; /* Set a taller height for the card */
+    overflow: hidden; /* Hide overflow content if necessary */
+}
+
+/* Adjustments for course image and text */
+.course_image {
+    width: 100%; /* Full width for the image */
+    height: auto; /* Maintain aspect ratio */
+    max-height: 150px; /* Increase maximum height for the image */
+    object-fit: cover; /* Cover to fill the space */
+}
+
+/* Heading styling */
+.course_card h3 {
+    margin: 10px 0; /* Add margin for better spacing */
+    font-size: 18px; /* Adjust font size */
+}
+
+/* Paragraph styling */
+.course_card p {
+    margin: 5px 0; /* Maintain some space between paragraphs */
+    font-size: 14px; /* Adjust font size for a more readable look */
+}
+
+
+/* Error message styling */
+.error_msg {
+    color: red; /* Red color for error messages */
+    font-size: 16px; /* Font size for error messages */
+    margin-top: 10px; /* Space above error messages */
+}
+
+/* Success message styling */
+.success_msg {
+    color: green; /* Green color for success messages */
+    font-size: 16px; /* Font size for success messages */
+    margin-top: 10px; /* Space above success messages */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .course_card {
+        padding: 10px; /* Reduce padding on smaller screens */
+    }
 }

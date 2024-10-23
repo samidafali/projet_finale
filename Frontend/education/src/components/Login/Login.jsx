@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import styles from "./styles.module.css";
-
+import Main from "../Main/Main";
 const Login = () => {
 	const [data, setData] = useState({ email: "", password: "" });
 	const [role, setRole] = useState("user"); // Default role is user
@@ -85,6 +85,7 @@ const handleSubmit = async (e) => {
 
 
 	return (
+		
 		<div className={styles.login_container}>
 			<div className={styles.login_form_container}>
 				<div className={styles.left}>

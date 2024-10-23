@@ -7,13 +7,13 @@
 	justify-content: space-between;
 	align-items: center;
 	padding: 1rem 2rem;
-	background-color: #333;
+	background-color:#d7ecff;
 	color: white;
 }
 
 .logo h1 {
 	font-size: 1.5rem;
-	color: white;
+	color: rgb(30, 18, 18);
 	margin: 0;
 }
 
@@ -29,18 +29,19 @@
 }
 
 .nav_links li a {
-	color: white;
+	color: rgb(12, 11, 11);
 	text-decoration: none;
 	font-size: 1.1rem;
 	transition: color 0.3s ease;
 }
 
 .nav_links li a:hover {
-	color: #00acee;
+	color: #0000FF
+	;
 }
 
 .logout_btn {
-	background-color: #f44336;
+	background-color: #0d0d0d;
 	color: white;
 	border: none;
 	padding: 0.5rem 1rem;

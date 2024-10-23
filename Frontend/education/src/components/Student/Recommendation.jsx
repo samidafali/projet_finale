@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './styles.module.css'; // Assurez-vous d'avoir un fichier CSS pour les styles
 import Main from '../Main/Main'; // Inclure la barre de navigation
+import Footer from '../Footer/Footer';
 
 const Recommendation = () => {
     const [categories, setCategories] = useState([]);
@@ -16,7 +17,7 @@ const Recommendation = () => {
         const fetchCategories = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/categories');
-                setCategories(response.data.categories);
+                setCategories(response.data.categories); // Assurez-vous que ce sont des catégories uniques
             } catch (error) {
                 console.error("Error fetching categories:", error);
             }
@@ -38,7 +39,7 @@ const Recommendation = () => {
         } catch (error) {
             console.error("Error fetching recommendations:", error);
             setRecommendedCourse(null);
-            setError("Failed to fetch the recommended course.");
+            setError("Aucun cours suggerer.");
             setSuccess(null);
         }
     };
@@ -64,7 +65,7 @@ const Recommendation = () => {
     };
 
     return (
-        <div>
+        <div className={styles.recommendation_container}>
             <Main /> {/* Inclure la barre de navigation */}
             <h2>Get Course Recommendations</h2>
             <form onSubmit={handleSubmit}>
@@ -78,7 +79,7 @@ const Recommendation = () => {
                         <option key={index} value={cat}>{cat}</option>
                     ))}
                 </select>
-
+        
                 <input
                     type="text"
                     placeholder="Difficulty (easy, medium, hard)"
@@ -88,27 +89,46 @@ const Recommendation = () => {
                 />
                 <button type="submit">Get Recommendation</button>
             </form>
-
+        
             {error && <div className={styles.error_msg}>{error}</div>}
             {success && <div className={styles.success_msg}>{success}</div>}
-
-            {recommendedCourse && (
-                <div className={styles.course_card}>
-                    <img src={recommendedCourse.imageUrl} alt={recommendedCourse.coursename} className={styles.course_image} />
-                    <h3>{recommendedCourse.coursename}</h3>
-                    <p>{recommendedCourse.description}</p>
-                    <p>Difficulty: {recommendedCourse.difficulty}</p>
-                    <p>Category: {recommendedCourse.category}</p>
-
-                    {!recommendedCourse.isFree && <p>Price: ${recommendedCourse.price}</p>}
-
-                    <button onClick={() => handleEnroll(recommendedCourse._id, recommendedCourse.isFree)} className={styles.enroll_btn}>
-                        {recommendedCourse.isFree ? "Enroll in Course" : "Pay to Enroll"}
-                    </button>
-                </div>
-            )}
+        
+            <div className={styles.courses_list}> {/* Conteneur pour les cartes */}
+                {recommendedCourse && (
+                    <div className={styles.course_card}>
+                        <img src={recommendedCourse.imageUrl} alt={recommendedCourse.coursename} className={styles.course_image} />
+                        <h3>{recommendedCourse.coursename}</h3>
+                        <p>{recommendedCourse.description}</p>
+                        <p>Difficulty: {recommendedCourse.difficulty}</p>
+                        <p>Category: {recommendedCourse.category}</p>
+        
+                        {!recommendedCourse.isFree && <p>Price: ${recommendedCourse.price}</p>}
+        
+                        <button onClick={() => handleEnroll(recommendedCourse._id, recommendedCourse.isFree)} className={styles.enroll_btn}>
+                            {recommendedCourse.isFree ? "Enroll in Course" : "Pay to Enroll"}
+                        </button>
+                    </div>
+                )}
+            </div>
+            <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />  <br />
+      <br />
+      <br />
+<Footer/>
         </div>
     );
+    
 };
 
 export default Recommendation;

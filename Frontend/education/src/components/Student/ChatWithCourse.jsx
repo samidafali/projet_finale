@@ -13,7 +13,7 @@ const ChatWithCourse = ({ courseId }) => {
     setError(null);
     
     try {
-      const res = await axios.post(`http://localhost:5000/chat/${courseId}`, {
+      const res = await axios.post(`http://localhost:5001/chat/${courseId}`, {
         question,
       }, {
         headers: {

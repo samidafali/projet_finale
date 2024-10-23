@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Main from '../Main/Main';
+import Footer from '../Footer/Footer';
 
 const UpdateProfile = () => {
   const [student, setStudent] = useState({
@@ -134,6 +135,11 @@ const UpdateProfile = () => {
           </button>
         </form>
       </div>
+      <br />
+      <br />
+      <br />
+      <br />
+<Footer/>
     </div>
   );
 };

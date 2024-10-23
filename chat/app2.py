@@ -67,6 +67,7 @@ def recommend_course():
     # Retourner le cours recommandé
     return jsonify({"recommended_course": recommended_course}), 200
 
+    logging.debug("Received request for course categories.")
 @app.route('/categories', methods=['GET'])
 def get_categories():
     logging.debug("Received request for course categories.")
@@ -78,8 +79,12 @@ def get_categories():
         logging.info("No categories found.")
         return jsonify({"message": "No categories found."}), 404
 
-    logging.debug(f"Categories found: {categories}")
-    return jsonify({"categories": categories}), 200
+    # Supprimer les doublons (si nécessaire)
+    unique_categories = list(set(categories))
+
+    logging.debug(f"Categories found: {unique_categories}")
+    return jsonify({"categories": unique_categories}), 200
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Main from '../Main/Main';
 import axios from 'axios';
 import styles from './styles.module.css';
+import Footer from '../Footer/Footer';
 
 const StudentDashboard = () => {
   const [student, setStudent] = useState(null); // State for student details
@@ -96,6 +97,11 @@ const StudentDashboard = () => {
 
      
       </div>
+      <br />
+      <br />
+      <br />
+      <br />
+<Footer/>
     </div>
   );
 };
