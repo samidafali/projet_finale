@@ -9,7 +9,7 @@ const adminRoutes = require("./routes/admin");
 const teacherRoutes = require("./routes/teacher");
 const courseRoutes = require("./routes/course");
 const studentRoutes = require("./routes/student");
-
+const messageRoutes = require("./routes/message");
 
 // database connection
 connection();
@@ -31,7 +31,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/teachers", teacherRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/students", studentRoutes);
-
+app.use("/api/messages", messageRoutes); 
 
 
 
